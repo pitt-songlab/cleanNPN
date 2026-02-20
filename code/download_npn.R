@@ -17,9 +17,9 @@ year_list <- 1900:(Sys.Date() |> lubridate::year())
 
 ###
 for (genusoi in genus_list) {
-  spid <- species_list %>%
-    filter(genus == genusoi) %>%
-    select(species_id) %>%
+  spid <- species_list |>
+    filter(genus == genusoi) |>
+    select(species_id) |>
     unique()
 
   for (year in year_list) {
