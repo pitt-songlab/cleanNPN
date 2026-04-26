@@ -30,17 +30,19 @@ for (genusoi in genus_list) {
       pheno_class_ids = 3
     )
 
-    file <- str_c(data_path, "leaf", "/", genusoi, "/", year, ".csv")
-    dir.create(dirname(file), recursive = T, showWarnings = F)
+    if (nrow(npn_leaf_df) > 0) {
+      file <- str_c(data_path, "leaf", "/", genusoi, "/", year, ".csv")
+      dir.create(dirname(file), recursive = T, showWarnings = F)
 
-    write.csv(
-      x = npn_leaf_df,
-      file = file,
-      row.names = FALSE,
-      quote = TRUE
-    )
+      write.csv(
+        x = npn_leaf_df,
+        file = file,
+        row.names = FALSE,
+        quote = TRUE
+      )
 
-    print(file)
+      print(file)
+    }
   }
 
   for (year in year_list) {
@@ -58,16 +60,18 @@ for (genusoi in genus_list) {
     )
     npn_flower_df <- rbind(npn_flower_df_1, npn_flower_df_2)
 
-    file <- str_c(data_path, "flower", "/", genusoi, "/", year, ".csv")
-    dir.create(dirname(file), recursive = T, showWarnings = F)
+    if (nrow(npn_flower_df) > 0) {
+      file <- str_c(data_path, "flower", "/", genusoi, "/", year, ".csv")
+      dir.create(dirname(file), recursive = T, showWarnings = F)
 
-    write.csv(
-      x = npn_flower_df,
-      file = file,
-      row.names = FALSE,
-      quote = TRUE
-    )
+      write.csv(
+        x = npn_flower_df,
+        file = file,
+        row.names = FALSE,
+        quote = TRUE
+      )
 
-    print(file)
+      print(file)
+    }
   }
 }
