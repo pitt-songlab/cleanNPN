@@ -36,7 +36,7 @@ flowers <- flowers %>%
   ungroup()
 
 #Visualize
-ggplot() +
+maple_flower <- ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
                fill = "gray90", color = "white", linewidth = 0.3) +
@@ -58,6 +58,9 @@ ggplot() +
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
   labs(title = "Acer Flower")
+maple_flower
+
+ggsave(filename = "Maple_First_Flower2025.png", plot = maple_flower, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Determine first leaf date for all maples
 leaves <- Acer_leaf25 %>%
@@ -66,7 +69,7 @@ leaves <- Acer_leaf25 %>%
   ungroup()
 
 #Visualize
-ggplot() +
+maple_leaf <- ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
                fill = "gray90", color = "white", linewidth = 0.3) +
@@ -88,6 +91,9 @@ ggplot() +
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
   labs(title = "Acer leaf")
+maple_leaf
+
+ggsave(filename = "Maple_First_Leaf2025.png", plot = maple_leaf, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Filter for red maple only to start
 
