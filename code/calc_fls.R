@@ -1,7 +1,7 @@
 
 #Exploratory Data Analysis
 #Written by Brianna Shepherd
-#Updated; May 18, 2026
+#Updated;May 27, 2026
 
 #load packages
 library(tidyverse)
@@ -164,6 +164,9 @@ merged_ACRU <- merged_ACRU %>% filter(day_of_year_leaf <= 243)
 
 merged_ACRU$FLS <- (abs(merged_ACRU$day_of_year_leaf - merged_ACRU$day_of_year))
 
+#Save dataframe
+
+write_csv(merged_ACRU, "/ix/ysong/projects/phenology-FLS/intermediate/ACRU_FLS_2025.csv")
 
 #Visualizations
 
