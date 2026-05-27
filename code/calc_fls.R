@@ -35,6 +35,11 @@ flowers <- flowers %>%
   slice_min(day_of_year, n = 1) %>%
   ungroup()
 
+#Remove outliers from dataset, set a limit of day 243 (August 31)
+#this date was selected relatively arbitrarily
+
+flowers <- flowers %>% filter(day_of_year <= 243)
+
 #Visualize
 maple_flower <- ggplot() +
   geom_polygon(data = us_map, 
@@ -43,11 +48,7 @@ maple_flower <- ggplot() +
   geom_point(data = flowers,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -57,16 +58,21 @@ maple_flower <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Acer Flower")
+  labs(title = "Acer Flower", color = "Day of Year")
 maple_flower
 
 ggsave(filename = "Maple_First_Flower2025.png", plot = maple_flower, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Determine first leaf date for all maples
-leaves <- Acer_leaf25 %>%
+leaves <- leaves %>%
   group_by(individual_id) %>%
   slice_min(day_of_year, n = 1) %>%
   ungroup()
+
+#Remove outliers from dataset, set a limit of day 243 (August 31)
+#this date was selected relatively arbitrarily
+
+leaves <- leaves %>% filter(day_of_year <= 243)
 
 #Visualize
 maple_leaf <- ggplot() +
@@ -76,11 +82,7 @@ maple_leaf <- ggplot() +
   geom_point(data = leaves,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -90,7 +92,7 @@ maple_leaf <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Acer leaf")
+  labs(title = "Acer leaf", color = "Day of Year")
 maple_leaf
 
 ggsave(filename = "Maple_First_Leaf2025.png", plot = maple_leaf, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
@@ -153,9 +155,14 @@ Red_leaf25 <- Red_leaf25 %>%
 
 merged_ACRU <- inner_join(Red_flower25, Red_leaf25, by = "individual_id")
 
+#Remove any individuals with DOY greater than 243 (August 31)
+
+merged_ACRU <- merged_ACRU %>% filter(day_of_year <= 243)
+merged_ACRU <- merged_ACRU %>% filter(day_of_year_leaf <= 243)
+
 #Calculate FLS
 
-merged_ACRU$FLS <- (merged_ACRU$day_of_year_leaf - merged_ACRU$day_of_year)
+merged_ACRU$FLS <- (abs(merged_ACRU$day_of_year_leaf - merged_ACRU$day_of_year))
 
 
 #Visualizations
@@ -169,11 +176,7 @@ ACRU_Flowers <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -183,7 +186,7 @@ ACRU_Flowers <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Red Maple Open Flowers")
+  labs(title = "Red Maple Open Flowers", color = "Day of Year")
 ACRU_Flowers
 
 #Leaves Map
@@ -195,11 +198,7 @@ ACRU_Leaves <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = day_of_year_leaf),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -209,7 +208,7 @@ ACRU_Leaves <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Red Maple Leaves")
+  labs(title = "Red Maple Leaves", color = "Day of Year")
 ACRU_Leaves
 
 #Days between Flower and Leaves
@@ -221,11 +220,7 @@ ACRU_FLS <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Number of Days",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -235,7 +230,7 @@ ACRU_FLS <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Red Maple FLS")
+  labs(title = "Red Maple FLS", color = "Number of Days")
 ACRU_FLS
 
 #join into one figure
@@ -243,6 +238,7 @@ ACRU_FLS
 ACRU <- (ACRU_Flowers + ACRU_Leaves + ACRU_FLS)
 ACRU
 
+ggsave(filename = "Red_Maple_2025.png", plot = ACRU, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Try with Peak flower (<75%) and first leaf
 
