@@ -585,6 +585,9 @@ flowers <- flowers %>%
   ungroup()
 
 #Visualize
+#5/28 NEED TO REMOVE POLLEN RELEASE FROM THIS BEFORE VISUALIZING
+#ALSO NEED TO CHANGE COLOR GRADIENT
+
 ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
@@ -646,6 +649,12 @@ Red_flower25 <- Quercus_flower25 %>%
 Red_leaf25 <- Quercus_leaf25 %>%
   filter(species == "rubra")
 
+#For flowers, filter out the pollen release information
+
+Red_flower25 <- Red_flower25 %>%
+  filter(phenophase_description == "Open flowers")
+
+
 #Remove observations that are uncertain or not observed (i.e -1 or 0)
 
 Red_flower25 <- Red_flower25 %>%
@@ -653,11 +662,6 @@ Red_flower25 <- Red_flower25 %>%
 
 Red_leaf25 <- Red_leaf25%>%
   filter(phenophase_status == 1)
-
-#For flowers, filter out the pollen release information
-
-Red_flower25 <- Red_flower25 %>%
-  filter(phenophase_description == "Open flowers")
 
 #Using first observation of each phenophase and only keep the first observation if there are multiple for the same individual 
 
@@ -700,6 +704,11 @@ merged_QURU <- inner_join(Red_flower25, Red_leaf25, by = "individual_id")
 
 merged_QURU$FLS <- (merged_QURU$day_of_year_leaf - merged_QURU$day_of_year)
 
+#Remove outliers for FLS
+
+merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year <= 243)
+merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year_leaf >= 30)
+
 #Visualizations
 
 #Open flowers map
@@ -711,11 +720,7 @@ QURU_Flowers <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -728,6 +733,8 @@ QURU_Flowers <- ggplot() +
   labs(title = "Northern Red Oak Open Flowers")
 QURU_Flowers
 
+ggsave(filename = "Red_Oak_flowers_2025.png", width = 9, height = 7, plot = QURU_Flowers, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
 #Leaves Map
 
 QURU_Leaves <- ggplot() +
@@ -737,11 +744,7 @@ QURU_Leaves <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = day_of_year_leaf),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -754,6 +757,9 @@ QURU_Leaves <- ggplot() +
   labs(title = "Northern Red Oak Leaves")
 QURU_Leaves
 
+ggsave(filename = "Red_Oak_leaves_2025.png", width = 9, height = 7, plot = QURU_Leaves, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
+
 #Days between Flower and Leaves
 
 QURU_FLS <- ggplot() +
@@ -763,11 +769,10 @@ QURU_FLS <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Number of Days",
-    direction = -1
-  ) +
+  scale_color_gradient2(low = "yellow",
+                        mid = "white",
+                        high = "purple", 
+                        midpoint = 0) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
