@@ -159,6 +159,7 @@ merged_ACRU <- inner_join(Red_flower25, Red_leaf25, by = "individual_id")
 
 merged_ACRU <- merged_ACRU %>% filter(day_of_year <= 243)
 merged_ACRU <- merged_ACRU %>% filter(day_of_year_leaf <= 243)
+#merged_ACRU <- merged_ACRU %>% filter(FLS <= 100) trying to filter out outliers
 
 #Calculate FLS
 
@@ -230,10 +231,11 @@ ACRU_FLS <- ggplot() +
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
   # scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
-  scale_color_gradient2(low = "blue",
+  scale_color_gradient2(low = "yellow",
     mid = "white",
-    high = "red", 
-    midpoint = 0) +
+    high = "purple", 
+    midpoint = 0,
+    limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
