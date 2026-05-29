@@ -48,7 +48,7 @@ maple_flower <- ggplot() +
   geom_point(data = flowers,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  scale_color_gradientn(colors = c("#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -82,7 +82,7 @@ maple_leaf <- ggplot() +
   geom_point(data = leaves,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -162,7 +162,7 @@ merged_ACRU <- merged_ACRU %>% filter(day_of_year_leaf <= 243)
 
 #Calculate FLS
 
-merged_ACRU$FLS <- (abs(merged_ACRU$day_of_year_leaf - merged_ACRU$day_of_year))
+merged_ACRU$FLS <- (merged_ACRU$day_of_year_leaf - merged_ACRU$day_of_year)
 
 #Save dataframe
 
@@ -179,7 +179,7 @@ ACRU_Flowers <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  scale_color_gradientn(colors = c("#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -192,6 +192,9 @@ ACRU_Flowers <- ggplot() +
   labs(title = "Red Maple Open Flowers", color = "Day of Year")
 ACRU_Flowers
 
+ggsave(filename = "Red_Maple_flowers_2025.png", width = 9, height = 7, plot = ACRU_Flowers, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
+
 #Leaves Map
 
 ACRU_Leaves <- ggplot() +
@@ -201,7 +204,7 @@ ACRU_Leaves <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = day_of_year_leaf),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -214,6 +217,9 @@ ACRU_Leaves <- ggplot() +
   labs(title = "Red Maple Leaves", color = "Day of Year")
 ACRU_Leaves
 
+ggsave(filename = "Red_Maple_leaves_2025.png", width = 9, height = 7, plot = ACRU_Leaves, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
+
 #Days between Flower and Leaves
 
 ACRU_FLS <- ggplot() +
@@ -223,7 +229,11 @@ ACRU_FLS <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  # scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  scale_color_gradient2(low = "blue",
+    mid = "white",
+    high = "red", 
+    midpoint = 0) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
