@@ -48,7 +48,7 @@ maple_flower <- ggplot() +
   geom_point(data = flowers,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22" )) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -60,6 +60,9 @@ maple_flower <- ggplot() +
   ) + 
   labs(title = "Acer Flower", color = "Day of Year")
 maple_flower
+
+#another color palette option
+#"#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22"
 
 ggsave(filename = "Maple_First_Flower2025.png", plot = maple_flower, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
@@ -171,6 +174,9 @@ write_csv(merged_ACRU, "/ix/ysong/projects/phenology-FLS/intermediate/ACRU_FLS_2
 
 #Visualizations
 
+#Load US Map
+us_map <- map_data("state")
+
 #Open flowers map
 
 ACRU_Flowers <- ggplot() +
@@ -180,7 +186,7 @@ ACRU_Flowers <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22" )) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -220,6 +226,9 @@ ACRU_Leaves
 
 ggsave(filename = "Red_Maple_leaves_2025.png", width = 9, height = 7, plot = ACRU_Leaves, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
+ACRU_joint <- ACRU_Flowers + ACRU_Leaves
+
+ggsave(filename = "Red Maple Joint Figure.png", width = 9, height = 7, plot = ACRU_joint, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Days between Flower and Leaves
 
@@ -231,11 +240,12 @@ ACRU_FLS <- ggplot() +
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
   # scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
-  scale_color_gradient2(low = "yellow",
+  scale_color_gradient2(low = "#FFC20A",
     mid = "white",
-    high = "purple", 
+    high = "#0C7BDC",
     midpoint = 0,
     limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
+  # scale_color_gradientn(colors = c("#FFC20A", "#0C7BDC"))+
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -250,10 +260,10 @@ ACRU_FLS
 
 #join into one figure
 
-ACRU <- (ACRU_Flowers + ACRU_Leaves + ACRU_FLS)
+ACRU <- (ACRU_Flowers / ACRU_Leaves) | ACRU_FLS
 ACRU
 
-ggsave(filename = "Red_Maple_2025.png", plot = ACRU, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+ggsave(filename = "Red_Maple_2025.png", width = 10, height = 12, plot = ACRU, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Try with Peak flower (<75%) and first leaf
 
