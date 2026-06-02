@@ -258,6 +258,9 @@ ACRU_FLS <- ggplot() +
   labs(title = "Red Maple FLS", color = "Number of Days")
 ACRU_FLS
 
+ggsave(filename = "Red_Maple_FLS_2025.png", width = 9, height = 7, plot = ACRU_FLS, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
+
 #join into one figure
 
 ACRU <- (ACRU_Flowers / ACRU_Leaves) | ACRU_FLS
@@ -730,7 +733,7 @@ QURU_Flowers <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22" )) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -769,6 +772,9 @@ QURU_Leaves
 
 ggsave(filename = "Red_Oak_leaves_2025.png", width = 9, height = 7, plot = QURU_Leaves, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
 
+QURU_joint <- QURU_Flowers + QURU_Leaves
+
+ggsave(filename = "Red Oak Joint Figure.png", width = 9, height = 7, plot = QURU_joint, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
 
 #Days between Flower and Leaves
 
@@ -779,10 +785,11 @@ QURU_FLS <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_gradient2(low = "yellow",
+  scale_color_gradient2(low = "#FFC20A",
                         mid = "white",
-                        high = "purple", 
-                        midpoint = 0) +
+                        high = "#0C7BDC",
+                        midpoint = 0,
+                        limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -795,11 +802,14 @@ QURU_FLS <- ggplot() +
   labs(title = "Northern Red Oak FLS")
 QURU_FLS
 
+ggsave(filename = "Red_Oak_FLS_2025.png", width = 10, height = 12, plot = QURU_FLS, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
 #join into one figure
 
-QURU <- (QURU_Flowers + QURU_Leaves + QURU_FLS)
+QURU <- (QURU_Flowers / QURU_Leaves) | QURU_FLS
 QURU
 
+ggsave(filename = "Red_Oak_2025.png", width = 10, height = 12, plot = QURU, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
 
 #Import 2025 Populus data
 
