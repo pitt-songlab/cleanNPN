@@ -10,6 +10,7 @@ download_terraclim <- function(v_var = c("temp", "prcp")) {
     }
 
     # download WorldClim data
+    #BRI - Might need to change world_var to worldclim_var in lines 14 and 16
     worldclim_url <- str_c("https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_", world_var, ".zip")
     worldclim_dir <- "alldata/input/climate/"
     worldclim_file <- str_c("wc2.1_30s_", world_var)
