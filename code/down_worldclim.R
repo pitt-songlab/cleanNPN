@@ -3,16 +3,16 @@ download_terraclim <- function(v_var = c("temp", "prcp")) {
 
   for (var in v_var) {
     if (var == "temp") {
-      worlclim_var <- "tavg"
+      worldclim_var <- "tavg"
     }
     if (var == "prcp") {
-      worlclim_var <- "prec"
+      worldclim_var <- "prec"
     }
 
     # download WorldClim data
-    worldclim_url <- str_c("https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_", worlclim_var, ".zip")
+    worldclim_url <- str_c("https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_", world_var, ".zip")
     worldclim_dir <- "alldata/input/climate/"
-    worldclim_file <- str_c("wc2.1_30s_", worlclim_var)
+    worldclim_file <- str_c("wc2.1_30s_", world_var)
 
     if (list.files(worldclim_dir, worldclim_file) %>% length() == 0) {
       options(timeout = max(600, getOption("timeout")))
