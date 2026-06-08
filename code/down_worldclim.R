@@ -1,3 +1,4 @@
+library(stringr)
 download_terraclim <- function(v_var = c("temp", "prcp")) {
   library(terra)
 
@@ -11,9 +12,9 @@ download_terraclim <- function(v_var = c("temp", "prcp")) {
 
     # download WorldClim data
     #BRI - Might need to change world_var to worldclim_var in lines 14 and 16
-    worldclim_url <- str_c("https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_", world_var, ".zip")
+    worldclim_url <- str_c("https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_", worldclim_var, ".zip")
     worldclim_dir <- "alldata/input/climate/"
-    worldclim_file <- str_c("wc2.1_30s_", world_var)
+    worldclim_file <- str_c("wc2.1_30s_", worldclim_var)
 
     if (list.files(worldclim_dir, worldclim_file) %>% length() == 0) {
       options(timeout = max(600, getOption("timeout")))
@@ -23,6 +24,7 @@ download_terraclim <- function(v_var = c("temp", "prcp")) {
       file.remove(worldclim_file_zip)
     }
 
+    
     # read WorldClim data
     worldclim_files <- list.files(
       str_c(worldclim_dir, worldclim_file),
@@ -45,6 +47,8 @@ download_terraclim <- function(v_var = c("temp", "prcp")) {
     terra::writeRaster(worldclim_mean, str_c("alldata/intermediate/worldclim_", var, ".tif"), overwrite = TRUE)
   }
 }
+
+download_terraclim()
 
 #Extracting at my specified coordinate
 
