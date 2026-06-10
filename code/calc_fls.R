@@ -1,7 +1,7 @@
 
 #Exploratory Data Analysis
 #Written by Brianna Shepherd
-#Updated; May 18, 2026
+#Updated;May 27, 2026
 
 #load packages
 library(tidyverse)
@@ -35,19 +35,20 @@ flowers <- flowers %>%
   slice_min(day_of_year, n = 1) %>%
   ungroup()
 
+#Remove outliers from dataset, set a limit of day 243 (August 31)
+#this date was selected relatively arbitrarily
+
+flowers <- flowers %>% filter(day_of_year <= 243)
+
 #Visualize
-ggplot() +
+maple_flower <- ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = flowers,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -57,27 +58,34 @@ ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Acer Flower")
+  labs(title = "Acer Flower", color = "Day of Year")
+maple_flower
+
+#another color palette option
+#"#fff0f3", "#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f","#ff4d6d","#c9184a","#a4133c","#800f2f", "#590d22"
+
+ggsave(filename = "Maple_First_Flower2025.png", plot = maple_flower, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Determine first leaf date for all maples
-leaves <- Acer_leaf25 %>%
+leaves <- leaves %>%
   group_by(individual_id) %>%
   slice_min(day_of_year, n = 1) %>%
   ungroup()
 
+#Remove outliers from dataset, set a limit of day 243 (August 31)
+#this date was selected relatively arbitrarily
+
+leaves <- leaves %>% filter(day_of_year <= 243)
+
 #Visualize
-ggplot() +
+maple_leaf <- ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = leaves,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -87,7 +95,10 @@ ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Acer leaf")
+  labs(title = "Acer leaf", color = "Day of Year")
+maple_leaf
+
+ggsave(filename = "Maple_First_Leaf2025.png", plot = maple_leaf, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Filter for red maple only to start
 
@@ -147,12 +158,24 @@ Red_leaf25 <- Red_leaf25 %>%
 
 merged_ACRU <- inner_join(Red_flower25, Red_leaf25, by = "individual_id")
 
+#Remove any individuals with DOY greater than 243 (August 31)
+
+merged_ACRU <- merged_ACRU %>% filter(day_of_year <= 243)
+merged_ACRU <- merged_ACRU %>% filter(day_of_year_leaf <= 243)
+#merged_ACRU <- merged_ACRU %>% filter(FLS <= 100) trying to filter out outliers
+
 #Calculate FLS
 
 merged_ACRU$FLS <- (merged_ACRU$day_of_year_leaf - merged_ACRU$day_of_year)
 
+#Save dataframe
+
+write_csv(merged_ACRU, "/ix/ysong/projects/phenology-FLS/intermediate/ACRU_FLS_2025.csv")
 
 #Visualizations
+
+#Load US Map
+us_map <- map_data("state")
 
 #Open flowers map
 
@@ -163,11 +186,7 @@ ACRU_Flowers <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -177,8 +196,11 @@ ACRU_Flowers <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Red Maple Open Flowers")
+  labs(title = "Red Maple Open Flowers", color = "Day of Year")
 ACRU_Flowers
+
+ggsave(filename = "Red_Maple_flowers_2025.png", width = 9, height = 7, plot = ACRU_Flowers, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
 
 #Leaves Map
 
@@ -189,11 +211,7 @@ ACRU_Leaves <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = day_of_year_leaf),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -203,8 +221,14 @@ ACRU_Leaves <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Red Maple Leaves")
+  labs(title = "Red Maple Leaves", color = "Day of Year")
 ACRU_Leaves
+
+ggsave(filename = "Red_Maple_leaves_2025.png", width = 9, height = 7, plot = ACRU_Leaves, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
+ACRU_joint <- ACRU_Flowers + ACRU_Leaves
+
+ggsave(filename = "Red Maple Joint Figure.png", width = 9, height = 7, plot = ACRU_joint, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Days between Flower and Leaves
 
@@ -215,11 +239,13 @@ ACRU_FLS <- ggplot() +
   geom_point(data = merged_ACRU,
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Number of Days",
-    direction = -1
-  ) +
+  # scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  scale_color_gradient2(low = "#FFC20A",
+    mid = "white",
+    high = "#0C7BDC",
+    midpoint = 0,
+    limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
+  # scale_color_gradientn(colors = c("#FFC20A", "#0C7BDC"))+
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -229,14 +255,18 @@ ACRU_FLS <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Red Maple FLS")
+  labs(title = "Red Maple FLS", color = "Number of Days")
 ACRU_FLS
+
+ggsave(filename = "Red_Maple_FLS_2025.png", width = 9, height = 7, plot = ACRU_FLS, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
 
 #join into one figure
 
-ACRU <- (ACRU_Flowers + ACRU_Leaves + ACRU_FLS)
+ACRU <- (ACRU_Flowers / ACRU_Leaves) | ACRU_FLS
 ACRU
 
+ggsave(filename = "Red_Maple_2025.png", width = 10, height = 12, plot = ACRU, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Try with Peak flower (<75%) and first leaf
 
@@ -568,6 +598,9 @@ flowers <- flowers %>%
   ungroup()
 
 #Visualize
+#5/28 NEED TO REMOVE POLLEN RELEASE FROM THIS BEFORE VISUALIZING
+#ALSO NEED TO CHANGE COLOR GRADIENT
+
 ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
@@ -629,6 +662,12 @@ Red_flower25 <- Quercus_flower25 %>%
 Red_leaf25 <- Quercus_leaf25 %>%
   filter(species == "rubra")
 
+#For flowers, filter out the pollen release information
+
+Red_flower25 <- Red_flower25 %>%
+  filter(phenophase_description == "Open flowers")
+
+
 #Remove observations that are uncertain or not observed (i.e -1 or 0)
 
 Red_flower25 <- Red_flower25 %>%
@@ -636,11 +675,6 @@ Red_flower25 <- Red_flower25 %>%
 
 Red_leaf25 <- Red_leaf25%>%
   filter(phenophase_status == 1)
-
-#For flowers, filter out the pollen release information
-
-Red_flower25 <- Red_flower25 %>%
-  filter(phenophase_description == "Open flowers")
 
 #Using first observation of each phenophase and only keep the first observation if there are multiple for the same individual 
 
@@ -683,6 +717,11 @@ merged_QURU <- inner_join(Red_flower25, Red_leaf25, by = "individual_id")
 
 merged_QURU$FLS <- (merged_QURU$day_of_year_leaf - merged_QURU$day_of_year)
 
+#Remove outliers for FLS
+
+merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year <= 243)
+merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year_leaf >= 30)
+
 #Visualizations
 
 #Open flowers map
@@ -694,11 +733,7 @@ QURU_Flowers <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -711,6 +746,8 @@ QURU_Flowers <- ggplot() +
   labs(title = "Northern Red Oak Open Flowers")
 QURU_Flowers
 
+ggsave(filename = "Red_Oak_flowers_2025.png", width = 9, height = 7, plot = QURU_Flowers, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
 #Leaves Map
 
 QURU_Leaves <- ggplot() +
@@ -720,11 +757,7 @@ QURU_Leaves <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = day_of_year_leaf),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -737,6 +770,12 @@ QURU_Leaves <- ggplot() +
   labs(title = "Northern Red Oak Leaves")
 QURU_Leaves
 
+ggsave(filename = "Red_Oak_leaves_2025.png", width = 9, height = 7, plot = QURU_Leaves, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
+QURU_joint <- QURU_Flowers + QURU_Leaves
+
+ggsave(filename = "Red Oak Joint Figure.png", width = 9, height = 7, plot = QURU_joint, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
 #Days between Flower and Leaves
 
 QURU_FLS <- ggplot() +
@@ -746,11 +785,11 @@ QURU_FLS <- ggplot() +
   geom_point(data = merged_QURU,
              aes(x = longitude, y = latitude, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Number of Days",
-    direction = -1
-  ) +
+  scale_color_gradient2(low = "#FFC20A",
+                        mid = "white",
+                        high = "#0C7BDC",
+                        midpoint = 0,
+                        limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -763,11 +802,14 @@ QURU_FLS <- ggplot() +
   labs(title = "Northern Red Oak FLS")
 QURU_FLS
 
+ggsave(filename = "Red_Oak_FLS_2025.png", width = 10, height = 12, plot = QURU_FLS, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
 #join into one figure
 
-QURU <- (QURU_Flowers + QURU_Leaves + QURU_FLS)
+QURU <- (QURU_Flowers / QURU_Leaves) | QURU_FLS
 QURU
 
+ggsave(filename = "Red_Oak_2025.png", width = 10, height = 12, plot = QURU, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
 
 #Import 2025 Populus data
 
