@@ -60,7 +60,7 @@ library(tidyverse)
 # ---- user choices ----
 phenophase <- "flower" # "flower" or "leaf"
 genus <- "Acer" # genus folder name
-species <- "rubrum" # species epithet, or NA to keep all species in the genus
+species <- "rubrum" # species epithet
 
 # ---- build path and read ----
 dir_path <- file.path("alldata/input/NPN", phenophase, genus)
