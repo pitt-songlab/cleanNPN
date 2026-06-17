@@ -597,22 +597,21 @@ flowers <- flowers %>%
   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
   ungroup()
 
-#Visualize
-#5/28 NEED TO REMOVE POLLEN RELEASE FROM THIS BEFORE VISUALIZING
-#ALSO NEED TO CHANGE COLOR GRADIENT
+#Remove pollen release data points
 
-ggplot() +
+flowers <- flowers %>% 
+  filter(phenophase_description == "Open flowers" )
+
+#Visualize
+
+oak_flowers_out <- ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = flowers,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -622,7 +621,8 @@ ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Quercus Flower")
+  labs(title = "Quercus Flower with Outliers", color = "Day of Year")
+oak_flowers_out
 
 #Determine first leaf date for all maples
 leaves <- Quercus_leaf25 %>%
@@ -631,18 +631,14 @@ leaves <- Quercus_leaf25 %>%
   ungroup()
 
 #Visualize
-ggplot() +
+oak_leaves_out <- ggplot() +
   geom_polygon(data = us_map, 
                aes(x = long, y = lat, group = group),
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = leaves,
              aes(x = longitude, y = latitude, color = day_of_year),
              size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -652,7 +648,62 @@ ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Quercus leaf")
+  labs(title = "Quercus leaf with Outliers")
+oak_leaves_out
+
+#Remove outliers from dataset, set a limit of day 243 (August 31)
+#this date was selected relatively arbitrarily
+
+flowers <- flowers %>% filter(day_of_year <= 243)
+leaves <- leaves %>% filter(day_of_year <= 243)
+
+#visualize
+oak_flowers <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = flowers,
+             aes(x = longitude, y = latitude, color = day_of_year),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "Quercus Flower without Outliers", color = "Day of Year")
+oak_flowers
+
+oak_leaves <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = leaves,
+             aes(x = longitude, y = latitude, color = day_of_year),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "Quercus leaf without Outliers")
+oak_leaves
+
+#Join images
+oak_flower_comparision <- oak_flowers_out + oak_flowers
+oak_leaves_comparison <- oak_leaves_out + oak_leaves
+
+ggsave(filename = "oak_flower_comparison2025.png", height = 7, width = 9, plot = oak_flower_comparision, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+ggsave(filename = "oak_leaves_comparison2025.png", height = 7, width = 9, plot = oak_leaves_comparison, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
 
 #Filter for Northern Red oak only to start
 
