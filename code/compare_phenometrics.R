@@ -282,3 +282,276 @@ Master_comparisons <- Flower_comparison / Leaf_comparison / FLS_comparisons
 Master_comparisons
 
 ggsave(filename = "ACER_2025_MasterComparison.png", plot = Master_comparions, width = 10, height = 10, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
+
+######################################################################################################
+#QUERCUS
+
+#Import individual phenometrics data for QUERCUS 2025 flowers
+QUERCUS_ind_phen_2025_flowers <- read_csv("alldata/input/NPN/flower_individual_phenometrics/Quercus/2025.csv")
+#386
+
+#Import individual phenometrics for ACER 2025 leaves
+QUERCUS_ind_phen_2025_leaves <- read_csv("/ix/ysong/projects/phenology-FLS/input/NPN/leaf_individual_phenometrics/Quercus/2025.csv")
+#1132 individuals
+
+#Compare how many individuals are in both dataframes
+cat("IDs in both:", length(intersect(QUERCUS_ind_phen_2025_flowers$individual_id, QUERCUS_ind_phen_2025_leaves$individual_id)), "\n")
+intersect(QUERCUS_ind_phen_2025_flowers$individual_id, QUERCUS_ind_phen_2025_leaves$individual_id)
+#344 individuals in both
+
+#rename column headers and select only the necessary columns for the join
+QUERCUS_ind_phen_2025_leaves <- QUERCUS_ind_phen_2025_leaves %>% 
+  select(individual_id, phenophase_description, first_yes_doy, last_yes_doy) %>%
+  rename(phenophase_description_leaf =  phenophase_description,
+         first_yes_doy_leaf = first_yes_doy,
+         last_yes_doy = last_yes_doy)
+
+#join data frames now
+QUERCUS_merged_ind_phen_2025 <- inner_join(QUERCUS_ind_phen_2025_flowers, QUERCUS_ind_phen_2025_leaves, by = "individual_id")
+
+#Calculate FLS
+QUERCUS_merged_ind_phen_2025$FLS <- (QUERCUS_merged_ind_phen_2025$first_yes_doy_leaf - QUERCUS_merged_ind_phen_2025$first_yes_doy)
+
+#Save merged csv -ONLY NEED TO DO ONCE UNLESS CHANGES ARE MADE ABOVE
+write_csv(QUERCUS_merged_ind_phen_2025, "/ix/ysong/projects/phenology-FLS/intermediate/QUERCUS_merged_indphen_2025.csv")
+
+#Import 2025 Raw Quercus data 
+Quercus_flower25 <- read_csv("alldata/input/NPN/flower/Quercus/2025.csv")
+View(Quercus_flower25)
+
+Quercus_leaf25<- read_csv("alldata/input/NPN/leaf/Quercus/2025.csv")
+View(Quercus_leaf25)
+
+#Filter flower dataframe to remove pollen release
+Quercus_flower25 <- Quercus_flower25 %>%
+  filter(phenophase_description == "Open flowers")
+
+#Remove observations that are uncertain or not observed (i.e -1 or 0)
+flowers <- Quercus_flower25 %>%
+  filter(phenophase_status == 1)
+
+leaves <- Quercus_leaf25 %>%
+  filter(phenophase_status == 1)
+
+#Determine first flower date for all observations
+flowers <- flowers %>%
+  group_by(individual_id) %>%
+  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+  ungroup()
+
+#Determine first leaf date for all maples
+leaves <- leaves %>%
+  group_by(individual_id) %>%
+  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+  ungroup()
+
+#Compare how many individuals are in both dataframes
+cat("IDs in both:", length(intersect(flowers$individual_id, leaves$individual_id)), "\n") #344
+intersect(flowers$individual_id, leaves$individual_id)
+
+#rename column headers and select only the necessary coloumns for the join
+leaves <- leaves %>% 
+  select(individual_id, phenophase_description, observation_date, day_of_year, phenophase_status, intensity_value) %>%
+  rename(phenophase_description_leaf =  phenophase_description,
+         observation_date_leaf = observation_date,
+         day_of_year_leaf = day_of_year,
+         phenophase_status_leaf = phenophase_status,
+         intensity_value_leaf = intensity_value)
+
+#Join data frames now
+merged_QUERCUS <- inner_join(flowers, leaves, by = "individual_id")
+
+#Calculate FLS
+merged_QUERCUS$FLS <- (merged_QUERCUS$day_of_year_leaf - merged_QUERCUS$day_of_year)
+
+#Save CSV
+write_csv(merged_QUERCUS, "/ix/ysong/projects/phenology-FLS/intermediate/QUERCUS_merged_2025.csv")
+
+#combine 
+master_FLS <- inner_join(merged_QUERCUS, QUERCUS_merged_ind_phen_2025, by = "individual_id")
+
+#Compare further with a scatter plot
+
+ggplot(data = master_FLS, aes(x = FLS.x, y = FLS.y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(x = "My FLS", y = "Phenometric FLS", title = "QUERCUS Correlation Plot") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#Significance test
+cor.test(master_FLS$FLS.x, master_FLS$FLS.y, method = "pearson")
+
+#data:  master_FLS$FLS.x and master_FLS$FLS.y
+# t = Inf, df = 342, p-value < 2.2e-16
+# alternative hypothesis: true correlation is not equal to 0
+# 95 percent confidence interval:
+#   1 1
+# sample estimates:
+#   cor 
+# 1 
+
+#Visualize
+#Load US Map
+us_map <- map_data("state")
+
+#Visualize all QUERCUS points with no outliers removed
+#Phenometrics first
+QUERCUS_flower_phenometrics <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = QUERCUS_merged_ind_phen_2025,
+             aes(x = longitude, y = latitude, color = first_yes_doy),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "Quercus Flower Individual Phenometrics", color = "Day of Year")
+QUERCUS_flower_phenometrics
+
+#My calculated FLS
+QUERCUS_flower <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = merged_QUERCUS,
+             aes(x = longitude, y = latitude, color = day_of_year),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "Quercus Flower", color = "Day of Year")
+QUERCUS_flower
+
+#Compare visualization of the two methods for flowers
+Flower_comparison <- (QUERCUS_flower_phenometrics + QUERCUS_flower) + plot_layout(guides = "collect")
+Flower_comparison
+
+ggsave(filename = "QUERCUS_2025_FlowerComparison.png", plot = Flower_comparison, width = 10, height = 6, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
+#LEAVES
+
+#Phenometrics first
+QUERCUS_leaf_phenometrics <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = QUERCUS_merged_ind_phen_2025,
+             aes(x = longitude, y = latitude, color = first_yes_doy_leaf),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "Quercus Leaf Individual Phenometrics", color = "Day of Year")
+QUERCUS_leaf_phenometrics
+
+#My calculations
+QUERCUS_leaf <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = merged_QUERCUS,
+             aes(x = longitude, y = latitude, color = day_of_year_leaf),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "Quercus Leaf", color = "Day of Year")
+QUERCUS_leaf
+
+#Compare visualization of the two methods for flowers
+Leaf_comparison <- (QUERCUS_leaf_phenometrics + QUERCUS_leaf) + plot_layout(guides = "collect")
+Leaf_comparison
+
+ggsave(filename = "QUERCUS_2025_LeafComparison.png", plot = Leaf_comparison, width = 10, height = 6, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
+
+#FLS
+#Phenometrics
+#Individual Phenometrics FLS
+QUERCUS_FLS_phenometrics <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = QUERCUS_merged_ind_phen_2025,
+             aes(x = longitude, y = latitude, color = FLS),
+             size = 3, alpha = 0.8) +
+  scale_color_gradient2(low = "#FFC20A",
+                        mid = "white",
+                        high = "#0C7BDC",
+                        midpoint = 0,
+                        limits = c(-max(QUERCUS_merged_ind_phen_2025$FLS), max(QUERCUS_merged_ind_phen_2025$FLS))) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "QUERCUS FLS Individual Phenometrics", color = "Number of Days")
+QUERCUS_FLS_phenometrics
+
+#My calculations
+QUERCUS_FLS <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = merged_QUERCUS,
+             aes(x = longitude, y = latitude, color = FLS),
+             size = 3, alpha = 0.8) +
+  scale_color_gradient2(low = "#FFC20A",
+                        mid = "white",
+                        high = "#0C7BDC",
+                        midpoint = 0,
+                        limits = c(-max(merged_QUERCUS$FLS), max(merged_QUERCUS$FLS))) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "QUERCUS FLS", color = "Number of Days")
+QUERCUS_FLS
+
+FLS_comparisons <- (QUERCUS_FLS_phenometrics + QUERCUS_FLS) + plot_layout(guides = "collect")
+FLS_comparisons
+
+#Master visualization
+Master_comparisons <- Flower_comparison / Leaf_comparison / FLS_comparisons
+Master_comparisons
+
+ggsave(filename = "QUERCUS_2025_MasterComparison.png", plot = Master_comparisons, width = 10, height = 10, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
