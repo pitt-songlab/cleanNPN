@@ -768,12 +768,10 @@ merged_QURU <- inner_join(Red_flower25, Red_leaf25, by = "individual_id")
 
 merged_QURU$FLS <- (merged_QURU$day_of_year_leaf - merged_QURU$day_of_year)
 
-#Remove outliers for FLS
-
-merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year <= 243)
-merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year_leaf >= 30)
-
 #Visualizations
+
+#Load US Map
+us_map <- map_data("state")
 
 #Open flowers map
 
@@ -794,7 +792,7 @@ QURU_Flowers <- ggplot() +
     legend.title = element_text(size = 10),
     plot.title = element_text(hjust = 0.5, size = 14)
   ) + 
-  labs(title = "Northern Red Oak Open Flowers")
+  labs(title = "Northern Red Oak Open Flowers", color = "Day of Year")
 QURU_Flowers
 
 ggsave(filename = "Red_Oak_flowers_2025.png", width = 9, height = 7, plot = QURU_Flowers, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
@@ -827,6 +825,11 @@ QURU_joint <- QURU_Flowers + QURU_Leaves
 
 ggsave(filename = "Red Oak Joint Figure.png", width = 9, height = 7, plot = QURU_joint, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
 
+#Remove outliers for FLS
+
+merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year <= 243)
+merged_QURU <- merged_QURU %>% filter(merged_QURU$day_of_year_leaf >= 30)
+
 #Days between Flower and Leaves
 
 QURU_FLS <- ggplot() +
@@ -840,7 +843,7 @@ QURU_FLS <- ggplot() +
                         mid = "white",
                         high = "#0C7BDC",
                         midpoint = 0,
-                        limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
+                        limits = c(-max(merged_QURU$FLS), max(merged_QURU$FLS))) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -862,457 +865,457 @@ QURU
 
 ggsave(filename = "Red_Oak_2025.png", width = 10, height = 12, plot = QURU, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Quercus")
 
-#Import 2025 Populus data
-
-Populus_flower25 <- read_csv("alldata/input/NPN/flower/Populus/2025.csv")
-View(Populus_flower25)
-
-Populus_leaf25 <- read_csv("alldata/input/NPN/leaf/Populus/2025.csv")
-View(Populus_leaf25)
-
-#Remove observations that are uncertain or not observed (i.e -1 or 0)
-
-flowers <- Populus_flower25 %>%
-  filter(phenophase_status == 1)
-
-leaves <- Populus_leaf25 %>%
-  filter(phenophase_status == 1)
-
-#Load US Map
-us_map <- map_data("state")
-
-#Determine first flower date for all observations
-flowers <- flowers %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
-  ungroup()
-
-#Visualize
-ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = flowers,
-             aes(x = longitude, y = latitude, color = day_of_year),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "Populus Flower")
-
-#Determine first leaf date for all maples
-leaves <- Populus_leaf25 %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1) %>%
-  ungroup()
-
-#Visualize
-ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = leaves,
-             aes(x = longitude, y = latitude, color = day_of_year),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "Populus leaf")
-
-#Filter for Quaking Aspen only to start
-
-Trem_flower25 <- Populus_flower25 %>%
-  filter(species == "tremuloides")
-
-Trem_leaf25 <- Populus_leaf25 %>%
-  filter(species == "tremuloides")
-
-#Remove observations that are uncertain or not observed (i.e -1 or 0)
-
-Trem_flower25 <- Trem_flower25 %>%
-  filter(phenophase_status == 1)
-
-Trem_leaf25 <- Trem_leaf25 %>%
-  filter(phenophase_status == 1)
-
-#For flowers, filter out the pollen release information
-
-Trem_flower25 <- Trem_flower25 %>%
-  filter(phenophase_description == "Open flowers")
-
-#Using first observation of each phenophase and only keep the first observation if there are multiple for the same individual 
-
-Trem_flower25 <- Trem_flower25 %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
-  ungroup()
-
-Trem_leaf25 <- Trem_leaf25 %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
-  ungroup()
-
-#Summary of ID overlap
-cat("IDs in df1:", n_distinct(Trem_flower25$individual_id), "\n")#28
-cat("IDs in df2:", n_distinct(Trem_leaf25$individual_id), "\n")#53
-cat("IDs in both:", length(intersect(Trem_flower25$individual_id, Trem_leaf25$individual_id)), "\n")#25
-cat("IDs only in df1:", length(setdiff(Trem_flower25$individual_id, Trem_leaf25$individual_id)), "\n")#3
-cat("IDs only in df2:", length(setdiff(Trem_flower25$individual_id, Trem_leaf25$individual_id)), "\n")#3
-
-intersect(Trem_flower25$individual_id, Trem_leaf25$individual_id)
-
-#There are only 25 ids that are documented in each dataframe
-
-#Rename column headers and select only the necessary coloumns for the join
-
-Trem_leaf25 <- Trem_leaf25 %>% 
-  select(individual_id, phenophase_description, observation_date, day_of_year, phenophase_status, intensity_value) %>%
-  rename(phenophase_description_leaf =  phenophase_description,
-         observation_date_leaf = observation_date,
-         day_of_year_leaf = day_of_year,
-         phenophase_status_leaf = phenophase_status,
-         intensity_value_leaf = intensity_value)
-
-#join data frames now
-
-merged_POTR <- inner_join(Trem_flower25, Trem_leaf25, by = "individual_id")
-
-#Calculate FLS
-
-merged_POTR$FLS <- (merged_POTR$day_of_year_leaf - merged_POTR$day_of_year)
-
-#Visualizations
-
-#Open flowers map
-
-POTR_Flowers <- ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = merged_POTR,
-             aes(x = longitude, y = latitude, color = day_of_year),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "Trembling Aspen Open Flowers")
-POTR_Flowers
-
-#Leaves Map
-
-POTR_Leaves <- ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = merged_POTR,
-             aes(x = longitude, y = latitude, color = day_of_year_leaf),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "Trembling Aspen Leaves")
-POTR_Leaves
-
-#Days between Flower and Leaves
-
-POTR_FLS <- ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = merged_POTR,
-             aes(x = longitude, y = latitude, color = FLS),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Number of Days",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "Trembling Aspen FLS")
-POTR_FLS
-
-#join into one figure
-
-POTR <- (POTR_Flowers + POTR_Leaves + POTR_FLS)
-POTR
-
-#Import 2025 Betula data
-
-Betula_flower25 <- read_csv("alldata/input/NPN/flower/Betula/2025.csv")
-View(Betula_flower25)
-
-Betula_leaf25 <- read_csv("alldata/input/NPN/leaf/Betula/2025.csv")
-View(Betula_leaf25)
-
-#Remove observations that are uncertain or not observed (i.e -1 or 0)
-
-flowers <- Betula_flower25 %>%
-  filter(phenophase_status == 1)
-
-leaves <- Betula_leaf25 %>%
-  filter(phenophase_status == 1)
-
-#Load US Map
-us_map <- map_data("state")
-
-#Determine first flower date for all observations
-flowers <- flowers %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
-  ungroup()
-
-#Visualize
-ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = flowers,
-             aes(x = longitude, y = latitude, color = day_of_year),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "Betula Flower")
-
-#Determine first leaf date for all maples
-leaves <- Betula_leaf25 %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1) %>%
-  ungroup()
-
-#Visualize
-ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = leaves,
-             aes(x = longitude, y = latitude, color = day_of_year),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "Betula leaf")
-
-#Filter for River birch only to start
-
-Riv_flower25 <- Betula_flower25 %>%
-  filter(species == "nigra")
-
-Riv_leaf25 <- Betula_leaf25 %>%
-  filter(species == "nigra")
-
-#Remove observations that are uncertain or not observed (i.e -1 or 0)
-
-Riv_flower25 <- Riv_flower25 %>%
-  filter(phenophase_status == 1)
-
-Riv_leaf25 <- Riv_leaf25 %>%
-  filter(phenophase_status == 1)
-
-#For flowers, filter out the pollen release information
-
-Riv_flower25 <- Riv_flower25 %>%
-  filter(phenophase_description == "Open flowers")
-
-
-#Using first observation of each phenophase and only keep the first observation if there are multiple for the same individual 
-
-Riv_flower25 <- Riv_flower25 %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
-  ungroup()
-
-Riv_leaf25 <- Riv_leaf25 %>%
-  group_by(individual_id) %>%
-  slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
-  ungroup()
-
-#Summary of ID overlap
-cat("IDs in df1:", n_distinct(Riv_flower25$individual_id), "\n")#16
-cat("IDs in df2:", n_distinct(Riv_leaf25$individual_id), "\n")#50
-cat("IDs in both:", length(intersect(Riv_flower25$individual_id, Riv_leaf25$individual_id)), "\n")#14
-cat("IDs only in df1:", length(setdiff(Riv_flower25$individual_id, Riv_leaf25$individual_id)), "\n")#2
-cat("IDs only in df2:", length(setdiff(Riv_flower25$individual_id, Riv_leaf25$individual_id)), "\n")#2
-
-intersect(Riv_flower25$individual_id, Riv_leaf25$individual_id)
-
-#There are only 14 individuals with observations in both dataframes
-
-#Rename column headers and select only the necessary coloumns for the join
-
-Riv_leaf25 <- Riv_leaf25 %>% 
-  select(individual_id, phenophase_description, observation_date, day_of_year, phenophase_status, intensity_value) %>%
-  rename(phenophase_description_leaf =  phenophase_description,
-         observation_date_leaf = observation_date,
-         day_of_year_leaf = day_of_year,
-         phenophase_status_leaf = phenophase_status,
-         intensity_value_leaf = intensity_value)
-
-#join data frames now
-
-merged_BENI <- inner_join(Riv_flower25, Riv_leaf25, by = "individual_id")
-
-#Calculate FLS
-
-merged_BENI$FLS <- (merged_BENI$day_of_year_leaf - merged_BENI$day_of_year)
-
-#Visualizations
-
-#Open flowers map
-
-BENI_Flowers <- ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = merged_BENI,
-             aes(x = longitude, y = latitude, color = day_of_year),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "River birch Open Flowers")
-BENI_Flowers
-
-#Leaves Map
-
-BENI_Leaves <- ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = merged_BENI,
-             aes(x = longitude, y = latitude, color = day_of_year_leaf),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Julian Date",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "River Birch Leaves")
-BENI_Leaves
-
-#Days between Flower and Leaves
-
-BENI_FLS <- ggplot() +
-  geom_polygon(data = us_map, 
-               aes(x = long, y = lat, group = group),
-               fill = "gray90", color = "white", linewidth = 0.3) +
-  geom_point(data = merged_BENI,
-             aes(x = longitude, y = latitude, color = FLS),
-             size = 3, alpha = 0.8) +
-  scale_color_viridis_c(
-    option = "viridis",
-    name = "Number of Days",
-    direction = -1
-  ) +
-  coord_fixed(1.3, 
-              xlim = c(-125, -65), 
-              ylim = c(24, 50)) +
-  theme_void() +
-  theme(
-    legend.position = "right",
-    legend.title = element_text(size = 10),
-    plot.title = element_text(hjust = 0.5, size = 14)
-  ) + 
-  labs(title = "River Birch FLS")
-BENI_FLS
-
-#join into one figure
-
-BENI <- (BENI_Flowers + BENI_Leaves + BENI_FLS)
-BENI
-
-#Most individuals have 0 days between FLS, is that due to limited observations or because leaf and flower emerge on the same day?
+# #Import 2025 Populus data
+# 
+# Populus_flower25 <- read_csv("alldata/input/NPN/flower/Populus/2025.csv")
+# View(Populus_flower25)
+# 
+# Populus_leaf25 <- read_csv("alldata/input/NPN/leaf/Populus/2025.csv")
+# View(Populus_leaf25)
+# 
+# #Remove observations that are uncertain or not observed (i.e -1 or 0)
+# 
+# flowers <- Populus_flower25 %>%
+#   filter(phenophase_status == 1)
+# 
+# leaves <- Populus_leaf25 %>%
+#   filter(phenophase_status == 1)
+# 
+# #Load US Map
+# us_map <- map_data("state")
+# 
+# #Determine first flower date for all observations
+# flowers <- flowers %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+#   ungroup()
+# 
+# #Visualize
+# ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = flowers,
+#              aes(x = longitude, y = latitude, color = day_of_year),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "Populus Flower")
+# 
+# #Determine first leaf date for all maples
+# leaves <- Populus_leaf25 %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1) %>%
+#   ungroup()
+# 
+# #Visualize
+# ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = leaves,
+#              aes(x = longitude, y = latitude, color = day_of_year),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "Populus leaf")
+# 
+# #Filter for Quaking Aspen only to start
+# 
+# Trem_flower25 <- Populus_flower25 %>%
+#   filter(species == "tremuloides")
+# 
+# Trem_leaf25 <- Populus_leaf25 %>%
+#   filter(species == "tremuloides")
+# 
+# #Remove observations that are uncertain or not observed (i.e -1 or 0)
+# 
+# Trem_flower25 <- Trem_flower25 %>%
+#   filter(phenophase_status == 1)
+# 
+# Trem_leaf25 <- Trem_leaf25 %>%
+#   filter(phenophase_status == 1)
+# 
+# #For flowers, filter out the pollen release information
+# 
+# Trem_flower25 <- Trem_flower25 %>%
+#   filter(phenophase_description == "Open flowers")
+# 
+# #Using first observation of each phenophase and only keep the first observation if there are multiple for the same individual 
+# 
+# Trem_flower25 <- Trem_flower25 %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+#   ungroup()
+# 
+# Trem_leaf25 <- Trem_leaf25 %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+#   ungroup()
+# 
+# #Summary of ID overlap
+# cat("IDs in df1:", n_distinct(Trem_flower25$individual_id), "\n")#28
+# cat("IDs in df2:", n_distinct(Trem_leaf25$individual_id), "\n")#53
+# cat("IDs in both:", length(intersect(Trem_flower25$individual_id, Trem_leaf25$individual_id)), "\n")#25
+# cat("IDs only in df1:", length(setdiff(Trem_flower25$individual_id, Trem_leaf25$individual_id)), "\n")#3
+# cat("IDs only in df2:", length(setdiff(Trem_flower25$individual_id, Trem_leaf25$individual_id)), "\n")#3
+# 
+# intersect(Trem_flower25$individual_id, Trem_leaf25$individual_id)
+# 
+# #There are only 25 ids that are documented in each dataframe
+# 
+# #Rename column headers and select only the necessary coloumns for the join
+# 
+# Trem_leaf25 <- Trem_leaf25 %>% 
+#   select(individual_id, phenophase_description, observation_date, day_of_year, phenophase_status, intensity_value) %>%
+#   rename(phenophase_description_leaf =  phenophase_description,
+#          observation_date_leaf = observation_date,
+#          day_of_year_leaf = day_of_year,
+#          phenophase_status_leaf = phenophase_status,
+#          intensity_value_leaf = intensity_value)
+# 
+# #join data frames now
+# 
+# merged_POTR <- inner_join(Trem_flower25, Trem_leaf25, by = "individual_id")
+# 
+# #Calculate FLS
+# 
+# merged_POTR$FLS <- (merged_POTR$day_of_year_leaf - merged_POTR$day_of_year)
+# 
+# #Visualizations
+# 
+# #Open flowers map
+# 
+# POTR_Flowers <- ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = merged_POTR,
+#              aes(x = longitude, y = latitude, color = day_of_year),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "Trembling Aspen Open Flowers")
+# POTR_Flowers
+# 
+# #Leaves Map
+# 
+# POTR_Leaves <- ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = merged_POTR,
+#              aes(x = longitude, y = latitude, color = day_of_year_leaf),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "Trembling Aspen Leaves")
+# POTR_Leaves
+# 
+# #Days between Flower and Leaves
+# 
+# POTR_FLS <- ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = merged_POTR,
+#              aes(x = longitude, y = latitude, color = FLS),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Number of Days",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "Trembling Aspen FLS")
+# POTR_FLS
+# 
+# #join into one figure
+# 
+# POTR <- (POTR_Flowers + POTR_Leaves + POTR_FLS)
+# POTR
+# 
+# #Import 2025 Betula data
+# 
+# Betula_flower25 <- read_csv("alldata/input/NPN/flower/Betula/2025.csv")
+# View(Betula_flower25)
+# 
+# Betula_leaf25 <- read_csv("alldata/input/NPN/leaf/Betula/2025.csv")
+# View(Betula_leaf25)
+# 
+# #Remove observations that are uncertain or not observed (i.e -1 or 0)
+# 
+# flowers <- Betula_flower25 %>%
+#   filter(phenophase_status == 1)
+# 
+# leaves <- Betula_leaf25 %>%
+#   filter(phenophase_status == 1)
+# 
+# #Load US Map
+# us_map <- map_data("state")
+# 
+# #Determine first flower date for all observations
+# flowers <- flowers %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+#   ungroup()
+# 
+# #Visualize
+# ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = flowers,
+#              aes(x = longitude, y = latitude, color = day_of_year),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "Betula Flower")
+# 
+# #Determine first leaf date for all maples
+# leaves <- Betula_leaf25 %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1) %>%
+#   ungroup()
+# 
+# #Visualize
+# ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = leaves,
+#              aes(x = longitude, y = latitude, color = day_of_year),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "Betula leaf")
+# 
+# #Filter for River birch only to start
+# 
+# Riv_flower25 <- Betula_flower25 %>%
+#   filter(species == "nigra")
+# 
+# Riv_leaf25 <- Betula_leaf25 %>%
+#   filter(species == "nigra")
+# 
+# #Remove observations that are uncertain or not observed (i.e -1 or 0)
+# 
+# Riv_flower25 <- Riv_flower25 %>%
+#   filter(phenophase_status == 1)
+# 
+# Riv_leaf25 <- Riv_leaf25 %>%
+#   filter(phenophase_status == 1)
+# 
+# #For flowers, filter out the pollen release information
+# 
+# Riv_flower25 <- Riv_flower25 %>%
+#   filter(phenophase_description == "Open flowers")
+# 
+# 
+# #Using first observation of each phenophase and only keep the first observation if there are multiple for the same individual 
+# 
+# Riv_flower25 <- Riv_flower25 %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+#   ungroup()
+# 
+# Riv_leaf25 <- Riv_leaf25 %>%
+#   group_by(individual_id) %>%
+#   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
+#   ungroup()
+# 
+# #Summary of ID overlap
+# cat("IDs in df1:", n_distinct(Riv_flower25$individual_id), "\n")#16
+# cat("IDs in df2:", n_distinct(Riv_leaf25$individual_id), "\n")#50
+# cat("IDs in both:", length(intersect(Riv_flower25$individual_id, Riv_leaf25$individual_id)), "\n")#14
+# cat("IDs only in df1:", length(setdiff(Riv_flower25$individual_id, Riv_leaf25$individual_id)), "\n")#2
+# cat("IDs only in df2:", length(setdiff(Riv_flower25$individual_id, Riv_leaf25$individual_id)), "\n")#2
+# 
+# intersect(Riv_flower25$individual_id, Riv_leaf25$individual_id)
+# 
+# #There are only 14 individuals with observations in both dataframes
+# 
+# #Rename column headers and select only the necessary coloumns for the join
+# 
+# Riv_leaf25 <- Riv_leaf25 %>% 
+#   select(individual_id, phenophase_description, observation_date, day_of_year, phenophase_status, intensity_value) %>%
+#   rename(phenophase_description_leaf =  phenophase_description,
+#          observation_date_leaf = observation_date,
+#          day_of_year_leaf = day_of_year,
+#          phenophase_status_leaf = phenophase_status,
+#          intensity_value_leaf = intensity_value)
+# 
+# #join data frames now
+# 
+# merged_BENI <- inner_join(Riv_flower25, Riv_leaf25, by = "individual_id")
+# 
+# #Calculate FLS
+# 
+# merged_BENI$FLS <- (merged_BENI$day_of_year_leaf - merged_BENI$day_of_year)
+# 
+# #Visualizations
+# 
+# #Open flowers map
+# 
+# BENI_Flowers <- ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = merged_BENI,
+#              aes(x = longitude, y = latitude, color = day_of_year),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "River birch Open Flowers")
+# BENI_Flowers
+# 
+# #Leaves Map
+# 
+# BENI_Leaves <- ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = merged_BENI,
+#              aes(x = longitude, y = latitude, color = day_of_year_leaf),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Julian Date",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "River Birch Leaves")
+# BENI_Leaves
+# 
+# #Days between Flower and Leaves
+# 
+# BENI_FLS <- ggplot() +
+#   geom_polygon(data = us_map, 
+#                aes(x = long, y = lat, group = group),
+#                fill = "gray90", color = "white", linewidth = 0.3) +
+#   geom_point(data = merged_BENI,
+#              aes(x = longitude, y = latitude, color = FLS),
+#              size = 3, alpha = 0.8) +
+#   scale_color_viridis_c(
+#     option = "viridis",
+#     name = "Number of Days",
+#     direction = -1
+#   ) +
+#   coord_fixed(1.3, 
+#               xlim = c(-125, -65), 
+#               ylim = c(24, 50)) +
+#   theme_void() +
+#   theme(
+#     legend.position = "right",
+#     legend.title = element_text(size = 10),
+#     plot.title = element_text(hjust = 0.5, size = 14)
+#   ) + 
+#   labs(title = "River Birch FLS")
+# BENI_FLS
+# 
+# #join into one figure
+# 
+# BENI <- (BENI_Flowers + BENI_Leaves + BENI_FLS)
+# BENI
+# 
+# #Most individuals have 0 days between FLS, is that due to limited observations or because leaf and flower emerge on the same day?

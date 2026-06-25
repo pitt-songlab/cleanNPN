@@ -39,7 +39,7 @@ ACER_merged_ind_phen_2025 <- inner_join(ACER_ind_phen_2025_flowers, ACER_ind_phe
 ACER_merged_ind_phen_2025$FLS <- (ACER_merged_ind_phen_2025$first_yes_doy_leaf - ACER_merged_ind_phen_2025$first_yes_doy)
 
 #Save merged csv -ONLY NEED TO DO ONCE UNLESS CHANGES ARE MADE ABOVE
-write_csv(ACER_merged_ind_phen_2025, "/ix/ysong/projects/phenology-FLS/intermediate/ACER_merged_indphen_2025.csv")
+# write_csv(ACER_merged_ind_phen_2025, "/ix/ysong/projects/phenology-FLS/intermediate/ACER_merged_indphen_2025.csv")
 
 #Import 2025 Raw Acer data 
 Acer_flower25 <- read_csv("alldata/input/NPN/flower/Acer/2025.csv")
@@ -171,6 +171,19 @@ Flower_comparison <- (ACER_flower_phenometrics + ACER_flower) + plot_layout(guid
 Flower_comparison
 
 ggsave(filename = "ACER_2025_FlowerComparison.png", plot = Flower_comparison, width = 10, height = 6, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
+#Scatterplot with latitude
+ggplot(data = master_FLS, aes(x = latitude.x, y = FLS.x))  +
+  geom_point() +
+  geom_smooth()
+
+ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year))  +
+  geom_point() +
+  geom_smooth()
+
+ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year_leaf))  +
+  geom_point() +
+  geom_smooth()
 
 #LEAVES
 
