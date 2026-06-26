@@ -132,7 +132,8 @@ ACER_flower_phenometrics <- ggplot() +
   geom_point(data = ACER_merged_ind_phen_2025,
              aes(x = longitude, y = latitude, color = first_yes_doy),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
+    facet_wrap(~common_name) +
+   scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B" )) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
@@ -173,17 +174,38 @@ Flower_comparison
 ggsave(filename = "ACER_2025_FlowerComparison.png", plot = Flower_comparison, width = 10, height = 6, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Scatterplot with latitude
-ggplot(data = master_FLS, aes(x = latitude.x, y = FLS.x))  +
+A1 <- ggplot(data = master_FLS, aes(x = latitude.x, y = FLS.x))  +
   geom_point() +
-  geom_smooth()
+  geom_smooth()+
+  labs(x = "Latitude", y = "FLS")+
+  theme_classic()
 
-ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year))  +
-  geom_point() +
-  geom_smooth()
+#Significance test
+cor.test(master_FLS$latitude.x, master_FLS$FLS.x, method = "pearson")
 
-ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year_leaf))  +
+
+A2 <- ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year))  +
   geom_point() +
-  geom_smooth()
+  geom_smooth() +
+  labs(x = "Latitude", y = "Flowering date")+
+  theme_classic()
+
+#Significance test
+cor.test(master_FLS$latitude.x, master_FLS$day_of_year, method = "pearson")
+
+A3 <- ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year_leaf))  +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Latitude", y = "Leaf Date")+
+  theme_classic()
+
+A3
+#Significance test
+cor.test(master_FLS$latitude.x, master_FLS$FLS.x, method = "pearson")
+
+
+latitude_correlation <- (A1 + A2 + A3) + labs(title = "Acer Genus")
+latitude_correlation
 
 #LEAVES
 
