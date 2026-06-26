@@ -176,9 +176,11 @@ ggsave(filename = "ACER_2025_FlowerComparison.png", plot = Flower_comparison, wi
 #Scatterplot with latitude
 A1 <- ggplot(data = master_FLS, aes(x = latitude.x, y = FLS.x))  +
   geom_point() +
-  geom_smooth()+
+  geom_smooth(method = MASS::rlm, formula = y ~ x)+
+  facet_wrap(~master_FLS$common_name.x)+
   labs(x = "Latitude", y = "FLS")+
   theme_classic()
+A1
 
 #Significance test
 cor.test(master_FLS$latitude.x, master_FLS$FLS.x, method = "pearson")
@@ -186,16 +188,18 @@ cor.test(master_FLS$latitude.x, master_FLS$FLS.x, method = "pearson")
 
 A2 <- ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year))  +
   geom_point() +
-  geom_smooth() +
+  geom_smooth(method = MASS::rlm, formula = y ~ x) +
+  facet_wrap(~master_FLS$common_name.x)+
   labs(x = "Latitude", y = "Flowering date")+
   theme_classic()
-
+A2
 #Significance test
 cor.test(master_FLS$latitude.x, master_FLS$day_of_year, method = "pearson")
 
 A3 <- ggplot(data = master_FLS, aes(x = latitude.x, y = day_of_year_leaf))  +
   geom_point() +
-  geom_smooth() +
+  geom_smooth(method = MASS::rlm, formula = y ~ x) +
+  facet_wrap(~master_FLS$common_name.x) +
   labs(x = "Latitude", y = "Leaf Date")+
   theme_classic()
 
