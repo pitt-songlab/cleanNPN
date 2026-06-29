@@ -237,14 +237,42 @@ ACRU_FLS <- ggplot() +
                aes(x = long, y = lat, group = group),
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = merged_ACRU,
-             aes(x = longitude, y = latitude, color = FLS),
-             size = 3, alpha = 0.8) +
+             aes(x = longitude, y = latitude, fill = FLS),
+             shape = 21, size = 2, color = "black", stroke = 0.5)+
+             # aes(x = longitude, y = latitude, color = FLS),
+             # size = 3, alpha = 0.8) +
   # scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
-  scale_color_gradient2(low = "#FFC20A",
+  scale_fill_gradient2(low = "#FFC20A",
     mid = "white",
     high = "#0C7BDC",
     midpoint = 0,
     limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
+  # scale_color_gradientn(colors = c("#FFC20A", "#0C7BDC"))+
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  ) + 
+  labs(title = "Red Maple FLS", color = "Number of Days")
+ACRU_FLS
+
+ACRU_FLS <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = merged_ACRU,
+  aes(x = longitude, y = latitude, color = FLS),
+  size = 3, alpha = 0.8) +
+  # scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  scale_color_gradient2(low = "#FFC20A",
+                        mid = "lightblue1",   # or "lightblue", etc.
+                        high = "#0C7BDC",
+                       midpoint = 0,
+                       limits = c(-max(merged_ACRU$FLS), max(merged_ACRU$FLS))) +
   # scale_color_gradientn(colors = c("#FFC20A", "#0C7BDC"))+
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
