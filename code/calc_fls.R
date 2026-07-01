@@ -18,6 +18,11 @@ View(Acer_flower25)
 Acer_leaf25<- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 View(Acer_leaf25)
 
+#Remove pollen release
+
+Acer_flower25 <- Acer_flower25 %>%
+  filter(phenophase_description == "Open flowers")
+
 #Remove observations that are uncertain or not observed (i.e -1 or 0)
 
 flowers <- Acer_flower25 %>%
@@ -286,8 +291,34 @@ ACRU_FLS <- ggplot() +
   labs(title = "Red Maple FLS", color = "Number of Days")
 ACRU_FLS
 
-ggsave(filename = "Red_Maple_FLS_2025.png", width = 9, height = 7, plot = ACRU_FLS, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+ACRU_FLS <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = merged_ACRU,
+             aes(x = longitude, y = latitude, color = FLS),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#005AD9", "#0070FF", "#FFF880", "#FFE135", "#E60026", "#C60012")) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  # theme(
+  #   legend.position = "right",
+  #   legend.title = element_text(size = 10),
+  #   plot.title = element_text(hjust = 0.5, size = 14)
+  # ) + 
+  # labs(title = "Red Maple FLS", color = "Number of Days")
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  ) +
+  labs(title = "Red Maple FLS", color = "Number of Days")
+ACRU_FLS
 
+ggsave(filename = "Red_Maple_FLS_2025.png", width = 9, height = 7, plot = ACRU_FLS, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #join into one figure
 
@@ -616,6 +647,11 @@ flowers <- Quercus_flower25%>%
 leaves <- Quercus_leaf25 %>%
   filter(phenophase_status == 1)
 
+#Remove pollen release data points
+
+flowers <- flowers %>% 
+  filter(phenophase_description == "Open flowers" )
+
 #Load US Map
 us_map <- map_data("state")
 
@@ -624,11 +660,6 @@ flowers <- flowers %>%
   group_by(individual_id) %>%
   slice_min(day_of_year, n = 1, with_ties = FALSE) %>%
   ungroup()
-
-#Remove pollen release data points
-
-flowers <- flowers %>% 
-  filter(phenophase_description == "Open flowers" )
 
 #Visualize
 
