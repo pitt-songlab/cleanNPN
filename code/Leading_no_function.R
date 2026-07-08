@@ -1,6 +1,7 @@
 
 #Filter by leading "no" function for NPN data
 #Written by Brianna Shepherd
+#Adapted from Erin Zylstra (NPN) code
 #Updated July 8, 2026
 
 #Load packages
@@ -10,12 +11,22 @@ library(tidyverse)
 #Import data
 ACERflower_2025 <- read_csv("alldata/input/NPN/flower/Acer/2025.csv")
 
+#Remove "pollen release" from dataframe
+
+ACERflower_2025 <- ACERflower_2025 %>%
+  filter(phenophase_description == "Open flowers")
+
+#Format the observation date
+ACERflower_2025 <- ACERflower_2025 %>%
+  mutate(obsdate = ymd(observation_date)) %>%
+  mutate(yr = year(observation_date))
+
 #Arrange individual, phenophase and date (used from Erin Z's code)
 test <- ACERflower_2025 %>%
-  arrange(individual_id, phenophase_id, observation_date, .keep_all = TRUE)
+  arrange(individual_id, phenophase_id, obsdate, .keep_all = TRUE)
 
 #Add information regarding previous observation status and days since that observation
-
+#(used from Erin Z's code)
 test2 <- test %>%
   mutate(indiv_php = paste0(individual_id, "_", phenophase_id),
          previous_status = NA,
@@ -31,15 +42,17 @@ for (i in 2:nrow(test2)) {
   }
 }
 
-#ERROR object 'i' not found
-
-test <- ACERflower_2025 %>%
+#Filter dataframe (used from Erin Z's code)
+clean <- test2 %>%
 filter(phenophase_status == 1 &
          !is.na(previous_status) &
          previous_status == 0 &
          prior_no <= 14) %>%
+  arrange(individual_id, phenophase_id, obsdate) %>%
+  distinct(individual_id, phenophase_id, yr, .keep_all = TRUE)
 
-#Function writing format
+#Function writing format ------------------------------------------------------
+#NOT COMPLETED - FOR THE NEXT STEP
 
 # function_name <- function(parameters){
 #   function body 
