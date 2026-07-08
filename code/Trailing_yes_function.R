@@ -25,20 +25,27 @@ ACERflower_2025 <- ACERflower_2025 %>%
 
 #Add information regarding previous observation status and days since that observation
 #(used from Erin Z's code)
-test <- ACERflower_2025 %>%
+ACERflower_2025 <- ACERflower_2025 %>%
   mutate(indiv_php = paste0(individual_id, "_", phenophase_id),
-         previous_status = NA,
-         prior_no = NA)
+         next_status = NA,
+         next_no = NA)
 
-for (i in 2:nrow(test2)) {
-  if (test2$indiv_php[i-1] == test2$indiv_php[i]) {
-    test2$previous_status[i] <- test2$phenophase_status[i-1]
-    test2$prior_no[i] <- as.numeric(test2$obsdate[i] - test2$obsdate[i-1])
+for (i in 1:(nrow(ACERflower_2025) - 1)) {
+  if (ACERflower_2025$indiv_php[i] == ACERflower_2025$indiv_php[i+1]) {
+    ACERflower_2025$next_status[i] <- ACERflower_2025$phenophase_status[i+1]
+    ACERflower_2025$next_no[i] <- as.numeric(ACERflower_2025$obsdate[i+1] - ACERflower_2025$obsdate[i])
   } else {
-    test2$previous_status[i] <- NA
-    test2$prior_no[i] <- NA
+    ACERflower_2025$next_status[i] <- NA
   }
 }
+
+#Filter for individuals that have at least 2 consecutive yes observations
+clean_ACERflower25 <- ACERflower_2025 %>%
+  filter(phenophase_status == 1 &
+           !is.na(next_status) &
+           next_status == 1) %>%
+  arrange(individual_id, phenophase_id, obsdate) %>%
+  distinct(individual_id, phenophase_id, yr, .keep_all = TRUE)
 
 #Function writing format
 
