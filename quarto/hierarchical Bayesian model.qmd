@@ -109,7 +109,7 @@ double_logistics <- function(d,
                              m6 = 20,
                              m7 = 0,
                              sd = 0.02) {
-  v <- m1 + (m2 - m7 * d) * (1 / (1 + exp((m3 - d) / m4)) - 1 / (1 + exp((m5 - d) / m6))) + rnorm(1, 0, sd)
+  v <- m1 + (m2 + m7 * d) * (1 / (1 + exp((m3 - d) / m4)) - 1 / (1 + exp((m5 - d) / m6))) + rnorm(1, 0, sd)
 
   return(v)
 }
