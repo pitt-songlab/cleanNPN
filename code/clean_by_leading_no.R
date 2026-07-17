@@ -3,27 +3,25 @@
 # Adapted from Erin Zylstra (NPN) code
 # Updated July 8, 2026
 
-clean_by_leading_no <- function(data) {
+clean_by_leading_no <- function(data, leading_window_days = 7) {
   data_clean <- data |>
-    filter(phenophase_status != -1) |>
+    dplyr::filter(phenophase_status != -1) |>
     # keep one obs per day, no over yes
-    arrange(individual_id, phenophase_id, observation_date, phenophase_status) |>
-    distinct(individual_id, phenophase_id, observation_date, .keep_all = T) |>
-    group_by(individual_id, phenophase_id) |>
-    mutate(
-      last_status = lag(phenophase_status),
-      days_to_last_obs = as.numeric(observation_date - lag(observation_date))
+    dplyr::arrange(individual_id, phenophase_id, observation_date, phenophase_status) |>
+    dplyr::distinct(individual_id, phenophase_id, observation_date, .keep_all = T) |>
+    dplyr::group_by(individual_id, phenophase_id) |>
+    dplyr::arrange(observation_date, .by_group = TRUE) |>
+    # Look backward from the window limit up to yesterday (.i = obsdate - 1)
+    dplyr::mutate(
+      leading_no_count = slider::slide_index_sum(
+        x = (phenophase_status == 0),
+        i = observation_date,
+        before = lubridate::days(leading_window_days), # Look back X days...
+        after = -1, # ...stop at yesterday (-1)
+        complete = FALSE
+      )
     ) |>
-    ungroup() |>
-    # Filter for individuals that have at least one leading no observations
-    filter(phenophase_status == 1 &
-      !is.na(last_status) &
-      last_status == 0) |>
-    rename(days_to_last_no = days_to_last_obs) |>
-    # filter (days_to_last_no <= max_days_to_last_no) |>
-    select(-last_status) |>
-    full_join(data) |>
-    arrange(individual_id, phenophase_id, observation_date)
+    dplyr::ungroup()
 
   return(data_clean)
 }

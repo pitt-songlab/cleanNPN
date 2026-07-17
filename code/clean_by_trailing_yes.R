@@ -2,28 +2,25 @@
 # Written by Brianna Shepherd
 # Updated July 8, 2026
 
-clean_by_trailing_yes <- function(data) {
+clean_by_trailing_yes <- function(data, trailing_window_days = 7) {
   data_clean <- data |>
-    filter(phenophase_status != -1) |>
+    dplyr::filter(phenophase_status != -1) |>
     # keep one obs per day, yes over no
-    arrange(individual_id, phenophase_id, observation_date, desc(phenophase_status)) |>
-    distinct(individual_id, phenophase_id, observation_date, .keep_all = T) |>
-    # Add information regarding previous observation status and days since that observation
-    # (used from Erin Z's code)
-    group_by(individual_id, phenophase_id) |>
-    mutate(
-      next_status = lead(phenophase_status),
-      days_to_next_obs = as.numeric(lead(observation_date) - observation_date)
+    dplyr::arrange(individual_id, phenophase_id, observation_date, desc(phenophase_status)) |>
+    dplyr::distinct(individual_id, phenophase_id, observation_date, .keep_all = T) |>
+    dplyr::group_by(individual_id, phenophase_id) |>
+    dplyr::arrange(observation_date, .by_group = TRUE) |>
+    # Look forward from tomorrow (.i = obsdate + 1) up to the window limit
+    dplyr::mutate(
+      trailing_yes_count = slider::slide_index_sum(
+        x = (phenophase_status == 1),
+        i = observation_date,
+        before = -1, # Start counting from tomorrow...
+        after = days(trailing_window_days), # ...up until X days from now
+        complete = FALSE
+      )
     ) |>
-    ungroup() |>
-    # Filter for individuals that have at least 2 consecutive yes observations
-    filter(phenophase_status == 1 &
-      !is.na(next_status) &
-      next_status == 1) |>
-    rename(days_to_next_yes = days_to_next_obs) |>
-    select(-next_status) |>
-    full_join(data) |>
-    arrange(individual_id, phenophase_id, observation_date)
+    dplyr::ungroup()
 
   return(data_clean)
 }
