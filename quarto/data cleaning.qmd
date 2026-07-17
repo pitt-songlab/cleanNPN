@@ -1,0 +1,103 @@
+---
+title: "NPN phenometrics data cleaning"
+author: ""
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: false
+    number-sections: true
+    fig-width: 8
+    fig-height: 6
+execute:
+  warning: false
+  message: false
+  eval: false
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE
+)
+knitr::opts_knit$set(root.dir = here::here()) # knit from project directory
+
+library(tidyverse)
+theme_set(ggthemes::theme_few())
+```
+
+# Load sample data
+```{r}
+df_flower <- read_csv("alldata/input/NPN/flower/Acer/2025.csv") |>
+  filter(phenophase_description == "Open flowers")
+
+df_leaf <- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
+```
+
+# Pipeline with data cleaning steps
+
+```{r}
+source(here::here("code", "clean_data.R"))
+source(here::here("code", "clean_by_leading_no.R"))
+source(here::here("code", "clean_by_trailing_yes.R"))
+source(here::here("code", "clean_by_window.R"))
+```
+
+```{r}
+df_flower_clean <- df_flower |>
+  clean_data(
+    max_days_to_last_no = 14,
+    max_days_to_next_yes = 14,
+    max_doy = 213
+  )
+
+df_leaf_clean <- df_leaf |>
+  clean_data(
+    max_days_to_last_no = 14,
+    max_days_to_next_yes = 14,
+    max_doy = 213
+  )
+```
+
+# Calculate onset day
+```{r}
+source(here::here("code", "calc_first_yes.R"))
+```
+
+```{r}
+df_flower_onset <- df_flower |>
+  calc_first_yes()
+
+df_flower_onset_clean <- df_flower_clean |>
+  calc_first_yes()
+
+bind_rows(
+  df_flower_onset |> mutate(group = "original"),
+  df_flower_onset_clean |> mutate(group = "clean")
+) |>
+  ggplot(aes(x = group, y = day_of_first_yes)) +
+  geom_boxplot() +
+  geom_jitter()
+```
+
+```{r}
+df_leaf_onset <- df_leaf |>
+  calc_first_yes()
+
+df_leaf_onset_clean <- df_leaf_clean |>
+  calc_first_yes()
+
+bind_rows(
+  df_leaf_onset |> mutate(group = "original"),
+  df_leaf_onset_clean |> mutate(group = "clean")
+) |>
+  ggplot(aes(x = group, y = day_of_first_yes)) +
+  geom_boxplot() +
+  geom_jitter()
+```
