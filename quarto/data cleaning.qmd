@@ -40,7 +40,7 @@ df_flower <- read_csv("alldata/input/NPN/flower/Acer/2025.csv") |>
 df_leaf <- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 ```
 
-# Pipeline with data cleaning steps
+# Data cleaning
 
 ```{r}
 source(here::here("code", "clean_data.R"))
