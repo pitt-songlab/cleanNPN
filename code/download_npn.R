@@ -122,7 +122,8 @@ for (genusoi in genus_list) {
           years = year,
           species_ids = spid$species_id,
           pheno_class_ids = 3,
-          num_days_quality_filter = 30
+          num_days_quality_filter = 30,
+          additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag")
         )
 
         if (!is.null(npn_leaf_df) && nrow(npn_leaf_df) > 0) {
@@ -144,14 +145,16 @@ for (genusoi in genus_list) {
       years = year,
       species_ids = spid$species_id,
       pheno_class_ids = 7,
-      num_days_quality_filter = 30
+      num_days_quality_filter = 30,
+      additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag")
     )
     npn_flower_df_2 <- rnpn::npn_download_site_phenometrics(
       request_source = "YS",
       years = year,
       species_ids = spid$species_id,
       pheno_class_ids = 8,
-      num_days_quality_filter = 30
+      num_days_quality_filter = 30,
+      additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag")
     )
 
     npn_flower_df <- rbind(npn_flower_df_1, npn_flower_df_2)
@@ -207,6 +210,7 @@ for (genusoi in genus_list) {
           years = year,
           species_ids = spid$species_id,
           pheno_class_ids = 3,
+          additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag")
         )
 
         if (!is.null(npn_leaf_df) && nrow(npn_leaf_df) > 0) {
@@ -237,6 +241,7 @@ for (genusoi in genus_list) {
           years = year,
           species_ids = spid$species_id,
           pheno_class_ids = 7,
+          additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag")
         )
 
         if (!is.null(npn_flower_df) && nrow(npn_flower_df) > 0) {
