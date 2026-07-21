@@ -198,10 +198,10 @@ for (genusoi in genus_list) {
   for (year in year_list) {
     file <- str_c(data_path, "leaf_individual_phenometrics/", genusoi, "/", year, ".csv")
 
-    if (file.exists(file)) {
-      message("Skipping (exists): ", file)
-      next
-    }
+    # if (file.exists(file)) {
+    #   message("Skipping (exists): ", file)
+    #   next
+    # }
 
     tryCatch(
       {
@@ -229,10 +229,10 @@ for (genusoi in genus_list) {
   for (year in year_list) {
     file <- str_c(data_path, "flower_individual_phenometrics/", genusoi, "/", year, ".csv")
 
-    if (file.exists(file)) {
-      message("Skipping (exists): ", file)
-      next
-    }
+    # if (file.exists(file)) {
+    #   message("Skipping (exists): ", file)
+    #   next
+    # }
 
     tryCatch(
       {
