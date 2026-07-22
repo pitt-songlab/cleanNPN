@@ -29,6 +29,17 @@ conflicts
 
 #Consistent
 
+#Count number of observations 
+data <- data %>%
+  group_by(ObservedBy_Person_ID) %>%
+  mutate(num_of_observations = n()) %>%
+  ungroup()
+
+#write a if statement that compares the conflict and keeps the observation from 
+#the observer with more observations that year
+
+
+
 #Experience
 
 #Function writing format-------------------------------------------------------
