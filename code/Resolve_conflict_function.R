@@ -51,19 +51,19 @@ Acer_filtered <- bind_rows(non_conflict, conflict_resolved) %>%
 #This is Bri's attempt at writing the function. This code can all be edited once it is approved.
 
 clean_by_resolving_conflict <- function(data){
-  data <- data |>
+  data_user_experience <- data |>
     #Count number of observations for each observer
     dplyr::group_by(observedby_person_id) |>
     dplyr::mutate(num_of_observations = n()) |>
     dplyr::ungroup()
     
   #Determine how many conflicting reports are in the dataframe
-  data_conflicts <- data |>
+  data_conflicts <- data_user_experience |>
     dplyr::group_by(individual_id, day_of_year) |>
-    dplyr::mutate(conflict = case_when(
+    dplyr::mutate(conflict = dplyr::case_when(
       any(phenophase_status == 0) & any(phenophase_status == 1) ~ TRUE,
       .default = FALSE )) |>
-    ungroup()
+    dplyr::ungroup()
   
   #For individuals with conflicting observations, keep the observation from the observer with
   #the most observations in the data frame
@@ -71,13 +71,13 @@ clean_by_resolving_conflict <- function(data){
   non_conflict <- data_conflicts |>
     dplyr::group_by(individual_id, day_of_year) |>
     dplyr::filter(!any(conflict)) |>
-    ungroup()
+    dplyr::ungroup()
   
   conflict_resolved <- data_conflicts |>
     dplyr::group_by(individual_id, day_of_year) |>
     dplyr::filter(any(conflict)) |>
     dplyr::slice_max(num_of_observations, n = 1, with_ties = FALSE) |>
-    ungroup()
+    dplyr::ungroup()
   
   data_filtered <- bind_rows(non_conflict, conflict_resolved) |>
     dplyr::arrange(individual_id, day_of_year)
