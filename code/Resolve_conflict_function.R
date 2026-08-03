@@ -80,7 +80,7 @@ clean_by_resolving_conflict <- function(data){
     ungroup()
   
   data_filtered <- bind_rows(non_conflict, conflict_resolved) |>
-    dpplyr::arrange(individual_id, day_of_year)
+    dplyr::arrange(individual_id, day_of_year)
     
   return(data_filtered)
 }
