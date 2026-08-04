@@ -19,12 +19,10 @@ Acer_leaf25<- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 View(Acer_leaf25)
 
 #Remove pollen release
-
 Acer_flower25 <- Acer_flower25 %>%
   filter(phenophase_description == "Open flowers")
 
 #Remove observations that are uncertain or not observed (i.e -1 or 0)
-
 flowers <- Acer_flower25 %>%
   filter(phenophase_status == 1)
 
@@ -42,7 +40,6 @@ flowers <- flowers %>%
 
 #Remove outliers from dataset, set a limit of day 243 (August 31)
 #this date was selected relatively arbitrarily
-
 flowers <- flowers %>% filter(day_of_year <= 243)
 
 #Visualize
@@ -79,7 +76,6 @@ leaves <- leaves %>%
 
 #Remove outliers from dataset, set a limit of day 243 (August 31)
 #this date was selected relatively arbitrarily
-
 leaves <- leaves %>% filter(day_of_year <= 243)
 
 #Visualize
@@ -104,6 +100,11 @@ maple_leaf <- ggplot() +
 maple_leaf
 
 ggsave(filename = "Maple_First_Leaf2025.png", plot = maple_leaf, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
+
+joint <- maple_flower + maple_leaf
+joint 
+
+ggsave(filename = "acerspringemergence2025.png", plot = joint, width = 9, height = 7, path = "/ix/ysong/projects/phenology-FLS/output/Figures/Acer")
 
 #Filter for red maple only to start
 
