@@ -1,6 +1,6 @@
 ---
 title: "NPN phenometrics data cleaning"
-author: ""
+author: "Yiluan Song"
 date: today
 format:
   html:
@@ -13,19 +13,14 @@ format:
 execute:
   warning: false
   message: false
-  eval: false
+  echo: true
+  cache: false
 editor: 
   markdown: 
     wrap: 72
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = FALSE,
-  message = FALSE,
-  warning = FALSE,
-  cache = FALSE
-)
 knitr::opts_knit$set(root.dir = here::here()) # knit from project directory
 
 library(tidyverse)

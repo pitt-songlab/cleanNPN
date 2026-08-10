@@ -1,3 +1,11 @@
+# Quarto execution & cache folders
+quarto/*_files/
+quarto/*_cache/
+quarto/.quarto/
+quarto/*.html
+quarto/*.pdf
+quarto/*.docx
+
 # History files
 .Rhistory
 .Rapp.history
