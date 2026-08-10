@@ -48,7 +48,7 @@ source(here::here("code", "clean_by_window.R"))
 ```{r}
 df_flower_clean <- df_flower |>
   clean_data(
-    calculate_experience_option = "by_year",
+    calculate_observation_option = "by_year",
     min_leading_no = 1,
     leading_window_days = 14,
     min_trailing_yes = 1,
@@ -58,7 +58,7 @@ df_flower_clean <- df_flower |>
 
 df_leaf_clean <- df_leaf |>
   clean_data(
-    calculate_experience_option = "by_year",
+    calculate_observation_option = "by_year",
     min_leading_no = 1,
     leading_window_days = 14,
     min_trailing_yes = 1,

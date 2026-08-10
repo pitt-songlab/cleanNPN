@@ -1,6 +1,6 @@
 clean_data <- function(data,
-                       calculate_experience_option = NULL,
-                       calculate_experience_by = NULL,
+                       calculate_observation_option = NULL,
+                       calculate_observation_by = NULL,
                        min_leading_no = NULL,
                        leading_window_days = NULL,
                        min_trailing_yes = NULL,
@@ -8,12 +8,12 @@ clean_data <- function(data,
                        min_doy = NULL, max_doy = NULL) {
   data_clean <- data
 
-  if (!is.null(calculate_experience_option)) {
+  if (!is.null(calculate_observation_option)) {
     message("Cleaning by resolving conflict")
     data_clean <- data_clean |>
       clean_by_resolving_conflict(
-        calculate_experience_option = calculate_experience_option,
-        calculate_experience_by = calculate_experience_by
+        calculate_observation_option = calculate_observation_option,
+        calculate_observation_by = calculate_observation_by
       )
   }
 
