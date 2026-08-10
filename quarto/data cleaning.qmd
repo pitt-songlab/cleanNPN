@@ -1,6 +1,6 @@
 ---
 title: "NPN phenometrics data cleaning"
-author: "Yiluan Song"
+author: "Yiluan"
 date: today
 format:
   html:
