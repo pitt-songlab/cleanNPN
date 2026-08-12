@@ -28,6 +28,7 @@ theme_set(ggthemes::theme_few())
 ```
 
 # Load sample data
+
 ```{r}
 df_flower <- read_csv("alldata/input/NPN/flower/Acer/2025.csv") |>
   filter(phenophase_description == "Open flowers")
@@ -36,7 +37,8 @@ df_leaf <- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 ```
 
 # Data cleaning
-#load functions
+
+#Load functions
 
 ```{r}
 source(here::here("code", "clean_data.R"))
@@ -46,7 +48,7 @@ source(here::here("code", "clean_by_trailing_yes.R"))
 source(here::here("code", "clean_by_window.R"))
 ```
 
-#Use functions to clean flower and leaf dataframes
+#Use functions to clean flower and leaf data frames
 
 ```{r}
 df_flower_clean <- df_flower |>
@@ -71,9 +73,14 @@ df_leaf_clean <- df_leaf |>
 ```
 
 # Calculate onset day
+
+Load function
+
 ```{r}
 source(here::here("code", "calc_first_yes.R"))
 ```
+
+Calculate flower onset date for both raw and cleaned data frames
 
 ```{r}
 df_flower_onset <- df_flower |>
@@ -91,6 +98,8 @@ bind_rows(
   geom_jitter()
 ```
 
+Calculate leaf onset for both raw and clean data frames
+
 ```{r}
 df_leaf_onset <- df_leaf |>
   calc_first_yes()
@@ -107,7 +116,7 @@ bind_rows(
   geom_jitter()
 ```
 
-#Compare all data cleaning functions seperately
+#Compare all data cleaning functions separately
 
 ```{r}
 df_flower_observation <- df_flower |>
@@ -146,6 +155,10 @@ df_leaf_max <- df_leaf |>
   clean_data(
     max_doy = 213)
 ```
+
+Calculate the flower onset data for each of the applied cleaning
+functions
+
 ```{r}
 df_flower_onset <- df_flower |>
   calc_first_yes()
@@ -179,6 +192,8 @@ bind_rows(
   scale_x_discrete(limits = c("original", "leading no", "trailing yes", "observation", "window", "clean")) +
   labs(x = "Data cleaning function", y = "Flower Onset Date", title = "Comparison of Flower Onset using data cleaning tools")
 ```
+
+Calculate the leaf onset data for each of the applied cleaning functions
 
 ```{r}
 df_leaf_onset <- df_leaf |>
@@ -214,10 +229,95 @@ bind_rows(
   labs(x = "Data cleaning function", y = "Leaf Onset Date", title = "Comparison of Leaf Onset using data cleaning tools")
 ```
 
-#Calculate FLS
+Visualize flower onset
 
-#Load US map
+Load US map
+
 ```{r}
 us_map <- map_data("state")
 
+flower_onset <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = df_flower_onset, 
+             aes(x = longitude, y = latitude, color = day_of_first_yes),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  labs(title = "Acer Flower Onset", color = "Day of Year")
+flower_onset
+
+flower_onset_clean <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = df_flower_onset_clean, 
+             aes(x = longitude, y = latitude, color = day_of_first_yes),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  labs(title = "Acer Flower Onset Clean", color = "Day of Year")
+flower_onset_clean
 ```
+
+Visuaulize leaf onset
+
+```{r}
+us_map <- map_data("state")
+
+leaf_onset <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = df_leaf_onset, 
+             aes(x = longitude, y = latitude, color = day_of_first_yes),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  labs(title = "Acer Flower Onset", color = "Day of Year")
+leaf_onset
+
+leaf_onset_clean <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = df_leaf_onset_clean, 
+             aes(x = longitude, y = latitude, color = day_of_first_yes),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  labs(title = "Acer Flower Onset Clean", color = "Day of Year")
+leaf_onset_clean
+```
+
+
+#Calculate FLS
+
+Combine data frames
+
+```{r}
+
+merged_flower_onset <- inner_join(df_flower_onset, df_flower_onset_clean, by = "individual_id")
+merged_leaf_onset <- inner_join(df_leaf_onset, df_leaf_onset_clean, by = "individual_id")
+merged_raw <- inner_join(df_flower_onset, df_leaf_onset, by = "individual_id")
+merged_clean <- inner_join(df_flower_onset_clean, df_leaf_onset_clean, by = "individual_id")
+
+```
+
+merged_raw$FLS <- (day_of_first_yes.x - day_of_first_yes.y)
+merged_clean$FLS <- 
+
+
