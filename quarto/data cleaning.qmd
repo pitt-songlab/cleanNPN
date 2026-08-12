@@ -178,7 +178,7 @@ df_flower_onset_yes <- df_flower_yes |>
 df_flower_onset_max <- df_flower_max |>
   calc_first_yes()
 
-bind_rows(
+flower_master_onset <- bind_rows(
   df_flower_onset |> mutate(group = "original"),
   df_flower_onset_clean |> mutate(group = "clean"),
   df_flower_onset_observation |> mutate(group = "observation"),
@@ -190,7 +190,8 @@ bind_rows(
   geom_boxplot() +
   geom_jitter() +
   scale_x_discrete(limits = c("original", "leading no", "trailing yes", "observation", "window", "clean")) +
-  labs(x = "Data cleaning function", y = "Flower Onset Date", title = "Comparison of Flower Onset using data cleaning tools")
+  labs(x = "Data cleaning function", y = "Flower Onset Date")
+flower_master_onset
 ```
 
 Calculate the leaf onset data for each of the applied cleaning functions
@@ -214,7 +215,7 @@ df_leaf_onset_yes <- df_leaf_yes |>
 df_leaf_onset_max <- df_leaf_max |>
   calc_first_yes()
 
-bind_rows(
+leaf_master_onset <- bind_rows(
   df_leaf_onset |> mutate(group = "original"),
   df_leaf_onset_clean |> mutate(group = "clean"),
   df_leaf_onset_observation |> mutate(group = "observation"),
@@ -226,7 +227,11 @@ bind_rows(
   geom_boxplot() +
   geom_jitter() +
   scale_x_discrete(limits = c("original", "leading no", "trailing yes", "observation", "window", "clean")) +
-  labs(x = "Data cleaning function", y = "Leaf Onset Date", title = "Comparison of Leaf Onset using data cleaning tools")
+  labs(x = "Data cleaning function", y = "Leaf Onset Date")
+leaf_master_onset
+
+gridExtra::grid.arrange(leaf_master_onset, flower_master_onset, ncol = 2)
+
 ```
 
 Visualize flower onset
@@ -248,7 +253,7 @@ flower_onset <- ggplot() +
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
   theme_void() +
-  labs(title = "Acer Flower Onset", color = "Day of Year")
+  labs(title = "Flower Onset", color = "Day of Year")
 flower_onset
 
 flower_onset_clean <- ggplot() +
@@ -263,8 +268,11 @@ flower_onset_clean <- ggplot() +
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
   theme_void() +
-  labs(title = "Acer Flower Onset Clean", color = "Day of Year")
+  labs(title = "Flower Onset Clean", color = "Day of Year")
 flower_onset_clean
+
+gridExtra::grid.arrange(leaf_onset, leaf_onset_clean, ncol = 2)
+
 ```
 
 Visuaulize leaf onset
@@ -284,7 +292,7 @@ leaf_onset <- ggplot() +
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
   theme_void() +
-  labs(title = "Acer Flower Onset", color = "Day of Year")
+  labs(title = "Leaf Onset", color = "Day of Year")
 leaf_onset
 
 leaf_onset_clean <- ggplot() +
@@ -299,10 +307,12 @@ leaf_onset_clean <- ggplot() +
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
   theme_void() +
-  labs(title = "Acer Flower Onset Clean", color = "Day of Year")
+  labs(title = "Leaf Onset Clean", color = "Day of Year")
 leaf_onset_clean
-```
 
+gridExtra::grid.arrange(leaf_onset, leaf_onset_clean, ncol = 2)
+
+```
 
 #Calculate FLS
 
@@ -317,7 +327,69 @@ merged_clean <- inner_join(df_flower_onset_clean, df_leaf_onset_clean, by = "ind
 
 ```
 
-merged_raw$FLS <- (day_of_first_yes.x - day_of_first_yes.y)
-merged_clean$FLS <- 
+```{r}
+merged_raw$FLS <- (merged_raw$day_of_first_yes.x -merged_raw$day_of_first_yes.y)
+merged_clean$FLS <- (merged_clean$day_of_first_yes.x -merged_clean$day_of_first_yes.y)
 
+us_map <- map_data("state")
 
+FLS_raw <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = merged_raw, 
+             aes(x = longitude.x, y = latitude.x, color = FLS),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  labs(title = "Flower Leaf Sequence", color = "Day of Year")
+FLS_raw
+
+FLS_clean <- ggplot() +
+  geom_polygon(data = us_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray90", color = "white", linewidth = 0.3) +
+  geom_point(data = merged_clean, 
+             aes(x = longitude.x, y = latitude.x, color = FLS),
+             size = 3, alpha = 0.8) +
+  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+  coord_fixed(1.3, 
+              xlim = c(-125, -65), 
+              ylim = c(24, 50)) +
+  theme_void() +
+  labs(title = "Flower Leaf Sequence Clean", color = "Day of Year")
+FLS_clean
+
+gridExtra::grid.arrange(FLS_raw, FLS_clean, ncol = 2)
+
+```
+
+#Linear Regession with latitude
+
+```{r}
+
+regression_raw <- ggplot(merged_raw, aes(x = latitude.x, y = FLS)) +
+ geom_point() +
+ geom_smooth(method = "lm", se = TRUE) +
+  labs(x = "Latitude", y = "Flower Leaf Sequence", title = "Raw Data Frame") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggpubr::stat_regline_equation(label.x = min(merged_raw$latitude.x), label.y = max(merged_raw$FLS)) +
+  ggpubr::stat_cor(label.x = min(merged_raw$latitude.x), label.y = max(merged_raw$FLS) * 0.9)
+regression_raw
+
+regression_clean <- ggplot(merged_clean, aes(x = latitude.x, y = FLS)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(x = "Latitude", y = "Flower Leaf Sequence", title = "Clean Data Frame") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+   ggpubr::stat_regline_equation(label.x = min(merged_clean$latitude.x), label.y = max(merged_clean$FLS)) +
+  ggpubr::stat_cor(label.x = min(merged_clean$latitude.x), label.y = max(merged_clean$FLS) * 0.9)
+regression_clean
+
+gridExtra::grid.arrange(regression_raw, regression_clean, ncol = 2)
+```
