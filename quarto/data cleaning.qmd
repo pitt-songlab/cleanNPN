@@ -36,6 +36,7 @@ df_leaf <- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 ```
 
 # Data cleaning
+#load functions
 
 ```{r}
 source(here::here("code", "clean_data.R"))
@@ -44,6 +45,8 @@ source(here::here("code", "clean_by_leading_no.R"))
 source(here::here("code", "clean_by_trailing_yes.R"))
 source(here::here("code", "clean_by_window.R"))
 ```
+
+#Use functions to clean flower and leaf dataframes
 
 ```{r}
 df_flower_clean <- df_flower |>
@@ -102,4 +105,115 @@ bind_rows(
   ggplot(aes(x = group, y = day_of_first_yes)) +
   geom_boxplot() +
   geom_jitter()
+```
+
+#Compare all data cleaning functions seperately
+
+```{r}
+df_flower_observation <- df_flower |>
+  clean_data(
+    calculate_observation_option = "by_year")
+
+df_flower_no <- df_flower |>
+  clean_data(
+    min_leading_no = 1,
+    leading_window_days = 14)
+
+df_flower_yes <- df_flower |>
+  clean_data(
+    min_trailing_yes = 1,
+    trailing_window_days = 14)
+
+df_flower_max <- df_flower |>
+  clean_data(
+    max_doy = 213)
+
+df_leaf_observation <- df_leaf |>
+  clean_data(
+    calculate_observation_option = "by_year")
+
+df_leaf_no <- df_leaf |>
+  clean_data(
+    min_leading_no = 1,
+    leading_window_days = 14)
+
+df_leaf_yes <- df_leaf |>
+  clean_data(
+    min_trailing_yes = 1,
+    trailing_window_days = 14)
+
+df_leaf_max <- df_leaf |>
+  clean_data(
+    max_doy = 213)
+```
+```{r}
+df_flower_onset <- df_flower |>
+  calc_first_yes()
+
+df_flower_onset_clean <- df_flower_clean |>
+  calc_first_yes()
+
+df_flower_onset_observation <- df_flower_observation |>
+  calc_first_yes()
+
+df_flower_onset_no <- df_flower_no |>
+  calc_first_yes()
+
+df_flower_onset_yes <- df_flower_yes |>
+  calc_first_yes()
+
+df_flower_onset_max <- df_flower_max |>
+  calc_first_yes()
+
+bind_rows(
+  df_flower_onset |> mutate(group = "original"),
+  df_flower_onset_clean |> mutate(group = "clean"),
+  df_flower_onset_observation |> mutate(group = "observation"),
+  df_flower_onset_no |> mutate(group = "leading no"),
+  df_flower_onset_yes |> mutate(group = "trailing yes"),
+  df_flower_onset_max |> mutate(group = "window")
+) |>
+  ggplot(aes(x = group, y = day_of_first_yes)) +
+  geom_boxplot() +
+  geom_jitter()
+```
+
+```{r}
+df_leaf_onset <- df_leaf |>
+  calc_first_yes()
+
+df_leaf_onset_clean <- df_leaf_clean |>
+  calc_first_yes()
+
+df_leaf_onset_observation <- df_leaf_observation |>
+  calc_first_yes()
+
+df_leaf_onset_no <- df_leaf_no |>
+  calc_first_yes()
+
+df_leaf_onset_yes <- df_leaf_yes |>
+  calc_first_yes()
+
+df_leaf_onset_max <- df_leaf_max |>
+  calc_first_yes()
+
+bind_rows(
+  df_leaf_onset |> mutate(group = "original"),
+  df_leaf_onset_clean |> mutate(group = "clean"),
+  df_leaf_onset_observation |> mutate(group = "observation"),
+  df_leaf_onset_no |> mutate(group = "leading no"),
+  df_leaf_onset_yes |> mutate(group = "trailing yes"),
+  df_leaf_onset_max |> mutate(group = "window")
+) |>
+  ggplot(aes(x = group, y = day_of_first_yes)) +
+  geom_boxplot() +
+  geom_jitter()
+```
+
+#Calculate FLS
+
+#Load US map
+```{r}
+us_map <- map_data("state")
+
 ```
