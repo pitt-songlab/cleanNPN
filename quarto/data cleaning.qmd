@@ -175,7 +175,9 @@ bind_rows(
 ) |>
   ggplot(aes(x = group, y = day_of_first_yes)) +
   geom_boxplot() +
-  geom_jitter()
+  geom_jitter() +
+  scale_x_discrete(limits = c("original", "leading no", "trailing yes", "observation", "window", "clean")) +
+  labs(x = "Data cleaning function", y = "Flower Onset Date", title = "Comparison of Flower Onset using data cleaning tools")
 ```
 
 ```{r}
@@ -207,7 +209,9 @@ bind_rows(
 ) |>
   ggplot(aes(x = group, y = day_of_first_yes)) +
   geom_boxplot() +
-  geom_jitter()
+  geom_jitter() +
+  scale_x_discrete(limits = c("original", "leading no", "trailing yes", "observation", "window", "clean")) +
+  labs(x = "Data cleaning function", y = "Leaf Onset Date", title = "Comparison of Leaf Onset using data cleaning tools")
 ```
 
 #Calculate FLS
