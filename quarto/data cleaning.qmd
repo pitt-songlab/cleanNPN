@@ -1,6 +1,6 @@
 ---
 title: "NPN phenometrics data cleaning"
-author: "Yiluan, Bri"
+author: "Yiluan Song, Brianna Shepherd"
 date: today
 format:
   html:
