@@ -186,11 +186,14 @@ flower_master_onset <- bind_rows(
   df_flower_onset_yes |> mutate(group = "trailing yes"),
   df_flower_onset_max |> mutate(group = "window")
 ) |>
-  ggplot(aes(x = group, y = day_of_first_yes)) +
+   ggplot(aes(x = group, y = day_of_first_yes, fill = group)) +
   geom_violin() +
+  scale_fill_manual(values = okabe_ito <- c("#E69F00","#F0E442","#D55E00",
+                                            "#56B4E9", "#009E73","#0072B2")) +
   geom_jitter(alpha =.1) +
   scale_x_discrete(limits = c("original", "leading no", "trailing yes", "conflict resolution", "window", "all methods")) +
-  labs(x = "Data cleaning function", y = "Flower Onset Date")
+  labs(x = "Data cleaning function", y = "Flower Onset Date") +
+  theme(legend.position = "none", axis.title.x = element_text(margin = margin(t = 10)), axis.title.y = element_text(margin = margin(r = 10)))
 flower_master_onset
 ```
 
@@ -223,11 +226,14 @@ leaf_master_onset <- bind_rows(
   df_leaf_onset_yes |> mutate(group = "trailing yes"),
   df_leaf_onset_max |> mutate(group = "window")
 ) |>
-  ggplot(aes(x = group, y = day_of_first_yes)) +
+  ggplot(aes(x = group, y = day_of_first_yes, fill = group)) +
   geom_violin() +
-  geom_jitter(alpha = .1) +
+  scale_fill_manual(values = okabe_ito <- c("#E69F00","#F0E442","#D55E00",
+                                            "#56B4E9", "#009E73","#0072B2")) +
+  geom_jitter(alpha =.1) +
   scale_x_discrete(limits = c("original", "leading no", "trailing yes", "conflict resolution", "window", "all methods")) +
-  labs(x = "Data cleaning function", y = "Leaf Onset Date")
+  labs(x = "Data cleaning function", y = "Flower Onset Date") +
+  theme(legend.position = "none", axis.title.x = element_text(margin = margin(t = 10)), axis.title.y = element_text(margin = margin(r = 10)))
 leaf_master_onset
 
 gridExtra::grid.arrange(flower_master_onset, leaf_master_onset, ncol = 1)
