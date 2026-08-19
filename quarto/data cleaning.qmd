@@ -349,12 +349,16 @@ FLS_raw <- ggplot() +
   geom_point(data = merged_raw, 
              aes(x = longitude.x, y = latitude.x, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+ scale_color_gradient2(low = "#e66101",
+  mid = "#f7f7f7",  
+  high = "#5e3c99",
+  midpoint = 0,
+  limits = c(-max(merged_raw$FLS), max(merged_raw$FLS))) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
   theme_void() +
-  labs(title = "Flower Leaf Sequence", color = "Day of Year")
+  labs(title = "Flower Leaf Sequence", color = "Number of Days")
 FLS_raw
 
 FLS_clean <- ggplot() +
@@ -364,12 +368,16 @@ FLS_clean <- ggplot() +
   geom_point(data = merged_clean, 
              aes(x = longitude.x, y = latitude.x, color = FLS),
              size = 3, alpha = 0.8) +
-  scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
+ scale_color_gradient2(low = "#e66101",
+  mid = "#f7f7f7",
+  high = "#5e3c99",
+  midpoint = 0,
+  limits = c(-max(merged_clean$FLS), max(merged_clean$FLS))) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
               ylim = c(24, 50)) +
   theme_void() +
-  labs(title = "Flower Leaf Sequence Clean", color = "Day of Year")
+  labs(title = "Flower Leaf Sequence Clean", color = "Number of Days")
 FLS_clean
 
 gridExtra::grid.arrange(FLS_raw, FLS_clean, ncol = 2)
