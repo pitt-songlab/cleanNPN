@@ -359,8 +359,10 @@ merged_clean <- inner_join(df_flower_onset_clean, df_leaf_onset_clean, by = "ind
 ```
 
 ```{r}
-merged_raw$FLS <- (merged_raw$day_of_first_yes.x -merged_raw$day_of_first_yes.y)
-merged_clean$FLS <- (merged_clean$day_of_first_yes.x -merged_clean$day_of_first_yes.y)
+
+#calculate FLS by subtracting flower onset date from leaf onset date. Negative values would indicate leaves emerged first
+merged_raw$FLS <- (merged_raw$day_of_first_yes.y - merged_raw$day_of_first_yes.x)
+merged_clean$FLS <- (merged_clean$day_of_first_yes.y - merged_clean$day_of_first_yes.x)
 
 us_map <- map_data("state")
 
