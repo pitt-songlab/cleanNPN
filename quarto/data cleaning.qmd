@@ -236,12 +236,16 @@ leaf_master_onset <- bind_rows(
                                             "#56B4E9", "#009E73","#0072B2")) +
   geom_jitter(alpha =.1) +
   scale_x_discrete(limits = c("original", "leading no", "trailing yes", "conflict resolution", "window", "all methods")) +
-  labs(x = "Data cleaning function", y = "Flower Onset Date") +
+  labs(x = "Data cleaning function", y = "Leaf Onset Date") +
   theme(legend.position = "none", axis.title.x = element_text(margin = margin(t = 10)), axis.title.y = element_text(margin = margin(r = 10)))
 leaf_master_onset
 
-gridExtra::grid.arrange(flower_master_onset, leaf_master_onset, ncol = 1)
-# add plot annotation
+#join plots and add anotations
+library(patchwork)
+
+flower_master_onset <- flower_master_onset + labs(x = NULL)
+flower_master_onset / leaf_master_onset + plot_annotation(tag_levels = 'A')
+
 ```
 
 Visualize flower onset
