@@ -240,8 +240,11 @@ leaf_master_onset <- bind_rows(
   theme(legend.position = "none", axis.title.x = element_text(margin = margin(t = 10)), axis.title.y = element_text(margin = margin(r = 10)))
 leaf_master_onset
 
-#join plots and add anotations
+#join plots and add annotations
 library(patchwork)
+
+#| fig-width: 12
+#| fig-height: 4
 
 flower_master_onset <- flower_master_onset + labs(x = NULL)
 flower_master_onset / leaf_master_onset + plot_annotation(tag_levels = 'A')
@@ -253,6 +256,9 @@ Visualize flower onset
 Load US map
 
 ```{r}
+#| fig-width: 12
+#| fig-height: 4
+
 us_map <- map_data("state")
 
 flower_onset <- ggplot() +
@@ -261,7 +267,7 @@ flower_onset <- ggplot() +
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = df_flower_onset, 
              aes(x = longitude, y = latitude, color = day_of_first_yes),
-             size = 3, alpha = 0.8) +
+             size = 2, alpha = 0.8) +
   scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
@@ -276,7 +282,7 @@ flower_onset_clean <- ggplot() +
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = df_flower_onset_clean, 
              aes(x = longitude, y = latitude, color = day_of_first_yes),
-             size = 3, alpha = 0.8) +
+             size = 2, alpha = 0.8) +
   scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
@@ -285,7 +291,11 @@ flower_onset_clean <- ggplot() +
   labs(title = "Flower Onset Clean", color = "Day of Year")
 flower_onset_clean
 
-gridExtra::grid.arrange(flower_onset, flower_onset_clean, ncol = 2)
+#join plots and add annotations
+#| fig-width: 12
+#| fig-height: 4
+
+flower_onset + flower_onset_clean + plot_annotation(tag_levels = 'A')
 
 ```
 
@@ -303,7 +313,7 @@ leaf_onset <- ggplot() +
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = df_leaf_onset, 
              aes(x = longitude, y = latitude, color = day_of_first_yes),
-             size = 3, alpha = 0.8) +
+             size = 2, alpha = 0.8) +
   scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
@@ -318,7 +328,7 @@ leaf_onset_clean <- ggplot() +
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = df_leaf_onset_clean, 
              aes(x = longitude, y = latitude, color = day_of_first_yes),
-             size = 3, alpha = 0.8) +
+             size = 2, alpha = 0.8) +
   scale_color_gradientn(colors = c("#D1EFAF", "#BBD997", "#A8CB7C", "#98B76C", "#849F5B", "#6C804C", "#586E3B","#405724", "#2F4814", "#1F320B")) +
   coord_fixed(1.3, 
               xlim = c(-125, -65), 
@@ -327,11 +337,15 @@ leaf_onset_clean <- ggplot() +
   labs(title = "Leaf Onset Clean", color = "Day of Year")
 leaf_onset_clean
 
-gridExtra::grid.arrange(leaf_onset, leaf_onset_clean, ncol = 2)
+#join plots and add annotations
+#| fig-width: 12
+#| fig-height: 4
+
+leaf_onset + leaf_onset_clean + plot_annotation(tag_levels = 'A')
 
 ```
 
-# Calculate FLS
+# Calculate Flower-Leaf Sequence (FLS)
 
 Combine data frames
 
@@ -356,7 +370,7 @@ FLS_raw <- ggplot() +
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = merged_raw, 
              aes(x = longitude.x, y = latitude.x, color = FLS),
-             size = 3, alpha = 0.8) +
+             size = 2, alpha = 1) +
  scale_color_gradient2(low = "#e66101",
   mid = "#f7f7f7",  
   high = "#5e3c99",
@@ -375,7 +389,7 @@ FLS_clean <- ggplot() +
                fill = "gray90", color = "white", linewidth = 0.3) +
   geom_point(data = merged_clean, 
              aes(x = longitude.x, y = latitude.x, color = FLS),
-             size = 3, alpha = 0.8) +
+             size = 2, alpha = 1) +
  scale_color_gradient2(low = "#e66101",
   mid = "#f7f7f7",
   high = "#5e3c99",
@@ -388,7 +402,11 @@ FLS_clean <- ggplot() +
   labs(title = "Flower Leaf Sequence Clean", color = "Number of Days")
 FLS_clean
 
-gridExtra::grid.arrange(FLS_raw, FLS_clean, ncol = 2)
+#join figures and add annotations
+#| fig-width: 15
+#| fig-height: 3
+
+FLS_raw + FLS_clean + plot_annotation(tag_levels = 'A')
 
 ```
 
@@ -416,12 +434,19 @@ regression_clean <- ggplot(merged_clean, aes(x = latitude.x, y = FLS)) +
   ggpubr::stat_cor(label.x = min(merged_clean$latitude.x), label.y = max(merged_clean$FLS) * 0.9)
 regression_clean
 
-gridExtra::grid.arrange(regression_raw, regression_clean, ncol = 2)
+#join figures and add annotations
+#| fig-width: 12
+#| fig-height: 4
+
+regression_raw + regression_clean + plot_annotation(tag_levels = 'A')
+
 ```
 # Combine all of the figures into one
 
 ```{r}
-#| fig-width: 8
-#| fig-height: 10
-gridExtra::grid.arrange(flower_onset, flower_onset_clean, leaf_onset, leaf_onset_clean, FLS_raw, FLS_clean, regression_raw, regression_clean, ncol = 2)
+#| fig-width: 12
+#| fig-height: 14
+
+(flower_onset + flower_onset_clean) / (leaf_onset + leaf_onset_clean) / (FLS_raw + FLS_clean) / (regression_raw + regression_clean) + plot_annotation(tag_levels = 'A')
+
 ```
