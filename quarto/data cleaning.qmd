@@ -95,7 +95,9 @@ bind_rows(
 ) |>
   ggplot(aes(x = group, y = day_of_first_yes)) +
   geom_boxplot() +
-  geom_jitter()
+  geom_jitter(alpha = 0.1) +
+  labs(x = "Data Type", y = "Day of First Observed Yes", title = "Flower Onset") +
+  theme(axis.title.y = element_text(margin = margin(r = 10)))
 ```
 
 Calculate leaf onset for both raw and clean data frames
@@ -113,7 +115,9 @@ bind_rows(
 ) |>
   ggplot(aes(x = group, y = day_of_first_yes)) +
   geom_boxplot() +
-  geom_jitter()
+  geom_jitter(alpha = 0.1) +
+  labs(x = "Data Type", y = "Day of First Observed Yes", title = "Leaf Onset") +
+  theme(axis.title.y = element_text(margin = margin(r = 10)))
 ```
 
 # Compare all data cleaning functions separately
