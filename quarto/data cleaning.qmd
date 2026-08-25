@@ -465,6 +465,7 @@ regression_raw + regression_clean + plot_annotation(tag_levels = 'A')
 ```{r}
 #| fig-width: 12
 #| fig-height: 14
+#| fig-cap: "A) Flower onset for Acer genus using raw dataset. B) Flower onset for Acer genus using clean dataset. C) Leaf onset for Acer genus using raw dataset. D) Leaf onset for Acer genus using clean dataset. E) Calculated flower-leaf sequence for Acer genus using raw dataset. F) Calculated flower-leaf sequence for Acer genus using clean dataset. G) Linear regression of the relationship between latitude and the flower-leaf sequence for Acer genus using raw dataset. H) Linear regression of the relationship between latitude and the flower-leaf sequence for Acer genus using clean dataset."
 
 (flower_onset + flower_onset_clean) / (leaf_onset + leaf_onset_clean) / (FLS_raw + FLS_clean) / (regression_raw + regression_clean) + plot_annotation(tag_levels = 'A')
 
