@@ -239,7 +239,9 @@ leaf_master_onset <- bind_rows(
   labs(x = "Data cleaning function", y = "Leaf Onset Date") +
   theme(legend.position = "none", axis.title.x = element_text(margin = margin(t = 10)), axis.title.y = element_text(margin = margin(r = 10)))
 leaf_master_onset
+```
 
+```{r}
 #join plots and add annotations
 library(patchwork)
 
@@ -292,9 +294,6 @@ flower_onset_clean <- ggplot() +
 flower_onset_clean
 
 #join plots and add annotations
-#| fig-width: 12
-#| fig-height: 4
-
 flower_onset + flower_onset_clean + plot_annotation(tag_levels = 'A')
 
 ```
@@ -338,8 +337,6 @@ leaf_onset_clean <- ggplot() +
 leaf_onset_clean
 
 #join plots and add annotations
-#| fig-width: 12
-#| fig-height: 4
 
 leaf_onset + leaf_onset_clean + plot_annotation(tag_levels = 'A')
 
@@ -350,6 +347,8 @@ leaf_onset + leaf_onset_clean + plot_annotation(tag_levels = 'A')
 Combine data frames
 
 ```{r}
+#| fig-width: 12
+#| fig-height: 4
 
 #calculate FLS by subtracting flower onset date from leaf onset date. Negative values would indicate leaves emerged first
 merged_raw <- inner_join(df_flower_onset, df_leaf_onset, by = "individual_id") |> 
@@ -397,8 +396,6 @@ FLS_clean <- ggplot() +
 FLS_clean
 
 #join figures and add annotations
-#| fig-width: 12
-#| fig-height: 4
 
 FLS_raw + FLS_clean + plot_annotation(tag_levels = 'A')
 
@@ -407,6 +404,8 @@ FLS_raw + FLS_clean + plot_annotation(tag_levels = 'A')
 # Linear Regession with latitude
 
 ```{r}
+#| fig-width: 7
+#| fig-height: 4
 
 regression_raw <- inner_join(df_flower_onset, df_leaf_onset, by = "individual_id") |>
   mutate(FLS = merged_raw$day_of_first_yes.y - merged_raw$day_of_first_yes.x) |>
@@ -417,7 +416,7 @@ regression_raw <- inner_join(df_flower_onset, df_leaf_onset, by = "individual_id
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5)) +
   ggpubr::stat_regline_equation(label.x = 40, label.y = -250) +
-  ggpubr::stat_cor(label.x = 40, label.y = -275)
+  ggpubr::stat_cor(label.x = 40, label.y = -280)
 regression_raw
 
 regression_clean <- inner_join(df_flower_onset_clean, df_leaf_onset_clean, by = "individual_id") |>
@@ -430,12 +429,15 @@ regression_clean <- inner_join(df_flower_onset_clean, df_leaf_onset_clean, by = 
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5)) +
   ggpubr::stat_regline_equation(label.x = 40, label.y = -60) +
-  ggpubr::stat_cor(label.x = 40, label.y = -65)
+  ggpubr::stat_cor(label.x = 40, label.y = -70)
 regression_clean
+```
 
-#join figures and add annotations
+```{r}
 #| fig-width: 14
 #| fig-height: 4
+
+#join figures and add annotations
 
 regression_raw + regression_clean + plot_annotation(tag_levels = 'A')
 
