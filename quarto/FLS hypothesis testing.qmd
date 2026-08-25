@@ -6,23 +6,17 @@ format: html
 editor: visual
 ---
 
-## Quarto
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = here::here()) # knit from project directory
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+library(tidyverse)
+theme_set(ggthemes::theme_few())
 ```
 
-You can add options to executable code like this
+Load data
 
-```{r}
-#| echo: false
-2 * 2
-```
+Test Hypotheses 
+Patterns in FLS among individuals within species along a latitudinal or climatic gradient
+Patterns in FLS across species along a latitudinal or climatic gradient
+Partition variance in FLS to species and individual level
 
-The `echo: false` option disables the printing of code (only output is displayed).
