@@ -13,10 +13,38 @@ library(tidyverse)
 theme_set(ggthemes::theme_few())
 ```
 
-Load data
+# Load data
 
-Test Hypotheses 
-Patterns in FLS among individuals within species along a latitudinal or climatic gradient
-Patterns in FLS across species along a latitudinal or climatic gradient
-Partition variance in FLS to species and individual level
+```{r}
+
+list.files()
+
+```
+
+# Apply Data Cleaning Functions
+
+``` {r}
+
+
+```
+# Test Hypotheses 
+
+## Patterns in FLS among individuals within species along a latitudinal or climatic gradient
+
+```{r}
+
+
+```
+## Patterns in FLS across species along a latitudinal or climatic gradient
+
+```{r}
+
+
+```
+## Partition variance in FLS to species and individual level
+
+```{r}
+
+
+```
 
