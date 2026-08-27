@@ -17,15 +17,51 @@ theme_set(ggthemes::theme_few())
 
 ```{r}
 
-list.files()
+flower_files <- list.files("alldata/input/NPN/flower/", recursive = TRUE, full.name = TRUE)
+flower <- lapply(flower_files, read.csv) |>
+  dplyr::bind_rows()
+
+leaf_files <- list.files("alldata/input/NPN/leaf/", recursive =  TRUE, full.name = TRUE)
+leaf <- lapply(leaf_files, read.csv) |>
+  dplyr::bind_rows()
 
 ```
 
-# Apply Data Cleaning Functions
+# Data Cleaning 
+
+## Load functions
+
+```{r}
+source(here::here("code", "clean_data.R"))
+source(here::here("code", "clean_by_resolving_conflict.R"))
+source(here::here("code", "clean_by_leading_no.R"))
+source(here::here("code", "clean_by_trailing_yes.R"))
+source(here::here("code", "clean_by_window.R"))
+```
+
+## Apply functions
 
 ``` {r}
 
+df_flower_clean <- flower |>
+  clean_data(
+    calculate_observation_option = "by_year",
+    min_leading_no = 1,
+    leading_window_days = 14,
+    min_trailing_yes = 1,
+    trailing_window_days = 14,
+    max_doy = 213
+  )
 
+df_leaf_clean <- df_leaf |>
+  clean_data(
+    calculate_observation_option = "by_year",
+    min_leading_no = 1,
+    leading_window_days = 14,
+    min_trailing_yes = 1,
+    trailing_window_days = 14,
+    max_doy = 213
+  )
 ```
 # Test Hypotheses 
 
