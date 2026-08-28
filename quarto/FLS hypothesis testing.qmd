@@ -17,13 +17,12 @@ theme_set(ggthemes::theme_few())
 
 ```{r}
 
-flower_files <- list.files("alldata/input/NPN/flower/", recursive = TRUE, full.name = TRUE)
-flower <- lapply(flower_files, read.csv) |>
-  dplyr::bind_rows()
+f_flower <- list.files("alldata/input/NPN/flower/", full.names = T, recursive = T)
+flower <- read_csv(f_flower) |>
+  filter(phenophase_description == "Open flowers")
 
-leaf_files <- list.files("alldata/input/NPN/leaf/", recursive =  TRUE, full.name = TRUE)
-leaf <- lapply(leaf_files, read.csv) |>
-  dplyr::bind_rows()
+f_leaf <- list.files("alldata/input/NPN/leaf/", full.names = T, recursive = T)
+leaf <- read_csv(f_leaf)
 
 ```
 
