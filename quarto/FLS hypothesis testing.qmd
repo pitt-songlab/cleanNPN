@@ -78,8 +78,13 @@ leaf_onset_clean <- leaf_clean |>
 
 #calculate by subtracting flower onset date from leaf onset date. Negative values would indicate leaves emerged first
 
-merged_df <- inner_join(flower_onset_clean, leaf_onset_clean, by = "individual_id") |>
-  mutate(FLS = day_of_first_yes.y - day_of_first_yes.x)
+merged_df <- inner_join(
+  leaf_onset_clean |>
+    select(latitude, longitude, genus, species, common_name, individual_id, year, leaf = day_of_first_yes),
+  flower_onset_clean |>
+    select(latitude, longitude, genus, species, common_name, individual_id, year, flower = day_of_first_yes)
+) |>
+  mutate(fls = leaf - flower)
 
 ```
 
@@ -89,7 +94,7 @@ merged_df <- inner_join(flower_onset_clean, leaf_onset_clean, by = "individual_i
 
 ```{r}
 
-df_fls |>
+merged_df |>
   filter(genus == "Acer") |>
   ggplot(aes(x = latitude, y = fls)) +
   geom_hline(yintercept = 0) +
