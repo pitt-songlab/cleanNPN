@@ -113,12 +113,12 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = df_fls |> filte
 
 ```{r}
 
-df_fls_sp <- df_fls |>
+fls_species <- merged_df |>
   filter(genus == "Acer") |>
   group_by(genus, species) |>
   summarize(latitude = median(latitude), fls = median(fls))
 
-df_fls_sp |>
+fls_species |>
   ggplot(aes(x = latitude, y = fls)) +
   geom_hline(yintercept = 0) +
   geom_point(aes(col = species), alpha = 0.5) +
@@ -128,7 +128,7 @@ df_fls_sp |>
 ```
 
 ```{r}
-lm(fls ~ latitude, data = df_fls_sp) |> summary()
+lm(fls ~ latitude, data = fls_species) |> summary()
 ```
 
 ## Partition variance in FLS to species and individual level
