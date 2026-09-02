@@ -94,16 +94,22 @@ merged_df <- inner_join(
 
 ```{r}
 
+#| fig-width: 12
+#| fig-height: 4
+
 merged_df |>
   filter(genus == "Acer") |>
+  filter(species != "freemanii" & species != "glabrum") |>
   ggplot(aes(x = latitude, y = fls)) +
-  geom_hline(yintercept = 0) +
   geom_point(aes(col = species), alpha = 0.1) +
   geom_smooth(aes(col = species, group = species), method = MASS::rlm, se = F, linewidth = 0.5) +
+  facet_wrap(~ species) +
   geom_smooth(method = MASS::rlm) +
-  labs(x = "Latitude", y = "Leaf - Flower")
+  labs(x = "Latitude", y = "Flower Leaf Sequence") +
+  theme(legend.position = "none")
 
 ```
+We removed two maple species because they did not have enough observations (<3 total across all years)
 
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = df_fls |> filter(genus == "Acer")) |> summary()
