@@ -1,4 +1,42 @@
+
+#Downloading climate data for FLS
+#Adapted by Brianna Shepherd
+#Updated 9/3/2026
+
+#Load packages
+library(tidyverse)
+library(readr)
 library(stringr)
+
+#Upload data to extract coordinates
+f_flower <- list.files("alldata/input/NPN/flower/", full.names = T, recursive = T)
+flower <- read_csv(f_flower) |>
+  filter(phenophase_description == "Open flowers")
+
+f_leaf <- list.files("alldata/input/NPN/leaf/", full.names = T, recursive = T)
+leaf <- read_csv(f_leaf)
+
+#Count number of unique individuals are in each data frame
+length(unique(flower$individual_id)) #18820
+length(unique(leaf$individual_id)) #18422
+
+#Group by individual ID and keep latitude and longitude
+flower_locations <- flower |> 
+  select(site_id, latitude, longitude, state, genus, species, individual_id) |>
+  group_by(individual_id) |>
+  filter(!duplicated(individual_id))
+
+leaf_locations <- leaf |>
+  select(site_id, latitude, longitude, state, genus, species, individual_id) |>
+  group_by(individual_id) |>
+  filter(!duplicated(individual_id))
+
+#Join data frames, but only add individuals not already found in the flower locations df
+locations <- rbind(flower_locations, anti_join(flower_locations, leaf_locations, by = c("individual_id")))
+
+write.csv(locations, "/ix/ysong/projects/phenology-FLS/intermediate/FLS_locations.csv")
+
+#Downloading the weather data
 download_terraclim <- function(v_var = c("temp", "prcp")) {
   library(terra)
 
