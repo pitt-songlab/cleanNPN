@@ -92,6 +92,8 @@ merged_df <- inner_join(
 
 ## Patterns in FLS among individuals within species along a latitudinal or climatic gradient
 
+
+Maple Species
 ```{r}
 
 #| fig-width: 12
@@ -112,7 +114,72 @@ merged_df |>
 We removed two maple species because they did not have enough observations (<3 total across all years)
 
 ```{r}
-lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = df_fls |> filter(genus == "Acer")) |> summary()
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Acer")) |> summary()
+```
+Oak Species
+
+```{r}
+
+#| fig-width: 12
+#| fig-height: 4
+
+merged_df |>
+  filter(genus == "Quercus") |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_point(aes(col = species), alpha = 0.1) +
+  geom_smooth(aes(col = species, group = species), method = MASS::rlm, se = F, linewidth = 0.5) +
+  facet_wrap(~ species) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Flower Leaf Sequence") +
+  theme(legend.position = "none")
+
+```
+
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Quercus")) |> summary()
+```
+Populus
+```{r}
+
+#| fig-width: 12
+#| fig-height: 4
+
+merged_df |>
+  filter(genus == "Populus") |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_point(aes(col = species), alpha = 0.1) +
+  geom_smooth(aes(col = species, group = species), method = MASS::rlm, se = F, linewidth = 0.5) +
+  facet_wrap(~ species) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Flower Leaf Sequence") +
+  theme(legend.position = "none")
+
+```
+
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Populus")) |> summary()
+```
+Betula
+
+```{r}
+
+#| fig-width: 12
+#| fig-height: 4
+
+merged_df |>
+  filter(genus == "Betula") |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_point(aes(col = species), alpha = 0.1) +
+  geom_smooth(aes(col = species, group = species), method = MASS::rlm, se = F, linewidth = 0.5) +
+  facet_wrap(~ species) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Flower Leaf Sequence") +
+  theme(legend.position = "none")
+
+```
+
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Betula")) |> summary()
 ```
 
 ## Patterns in FLS across species along a latitudinal or climatic gradient
@@ -132,15 +199,71 @@ fls_species |>
   geom_smooth(method = MASS::rlm) +
   labs(x = "Latitude", y = "Leaf - Flower")
 ```
+```{r}
+lm(fls ~ latitude, data = fls_species) |> summary()
+```
 
+Oak
+
+```{r}
+fls_species <- merged_df |>
+  filter(genus == "Quercus") |>
+  group_by(genus, species) |>
+  summarize(latitude = median(latitude), fls = median(fls))
+
+fls_species |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = species), alpha = 0.5) +
+  geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Leaf - Flower")
+
+```
+```{r}
+lm(fls ~ latitude, data = fls_species) |> summary()
+```
+
+Populus
+
+```{r}
+fls_species <- merged_df |>
+  filter(genus == "Populus") |>
+  group_by(genus, species) |>
+  summarize(latitude = median(latitude), fls = median(fls))
+
+fls_species |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = species), alpha = 0.5) +
+  geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Leaf - Flower")
+
+```
+```{r}
+lm(fls ~ latitude, data = fls_species) |> summary()
+```
+
+Betula
+
+```{r}
+fls_species <- merged_df |>
+  filter(genus == "Betula") |>
+  group_by(genus, species) |>
+  summarize(latitude = median(latitude), fls = median(fls))
+
+fls_species |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = species), alpha = 0.5) +
+  geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Leaf - Flower")
+
+```
 ```{r}
 lm(fls ~ latitude, data = fls_species) |> summary()
 ```
 
 ## Partition variance in FLS to species and individual level
-
-```{r}
-
-
-```
-
