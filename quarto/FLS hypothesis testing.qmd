@@ -90,10 +90,33 @@ merged_df <- inner_join(
 
 # Test Hypotheses 
 
-## Patterns in FLS among individuals within species along a latitudinal or climatic gradient
+## Patterns in FLS among individuals within species along a latitudinal gradient
 
+### By Genus
+```{r}
 
-Maple Species
+#| fig-width: 12
+#| fig-height: 4
+
+merged_df |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_point(aes(col = species), alpha = 0.1) +
+  geom_smooth(aes(col = species, group = species), method = MASS::rlm, se = F, linewidth = 0.5) +
+  facet_wrap(~ genus) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Flower Leaf Sequence") +
+  theme(legend.position = "none")
+
+```
+
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df) |> summary()
+```
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df) |> summary()
+```
+
+### Maple Species
 ```{r}
 
 #| fig-width: 12
@@ -116,7 +139,11 @@ We removed two maple species because they did not have enough observations (<3 t
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Acer")) |> summary()
 ```
-Oak Species
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Acer")) |> summary()
+```
+
+### Oak Species
 
 ```{r}
 
@@ -138,7 +165,12 @@ merged_df |>
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Quercus")) |> summary()
 ```
-Populus
+
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Quercus")) |> summary()
+```
+
+### Populus Species
 ```{r}
 
 #| fig-width: 12
@@ -159,8 +191,12 @@ merged_df |>
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Populus")) |> summary()
 ```
-Betula
 
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Populus")) |> summary()
+```
+
+### Betula Species
 ```{r}
 
 #| fig-width: 12
@@ -182,7 +218,26 @@ merged_df |>
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Betula")) |> summary()
 ```
 
-## Patterns in FLS across species along a latitudinal or climatic gradient
+```{r}
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Betula")) |> summary()
+```
+
+## Patterns in FLS across species along a latitudinal gradient
+
+```{r}
+
+fls_genus <- merged_df |>
+  group_by(genus, year) |>
+  summarize(latitude = median(latitude), fls = median(fls))
+
+fls_genus |>
+  ggplot(aes(x = latitude, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = genus), alpha = 0.5) +
+  geom_smooth(aes(col = genus), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Latitude", y = "Leaf - Flower")
+```
 
 ```{r}
 
