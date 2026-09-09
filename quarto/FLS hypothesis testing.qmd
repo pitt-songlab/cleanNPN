@@ -140,7 +140,7 @@ We removed two maple species because they did not have enough observations (<3 t
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Acer")) |> summary()
 ```
 ```{r}
-lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Acer")) |> summary()
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = merged_df |> filter(genus == "Acer")) |> summary()
 ```
 
 ### Oak Species
@@ -167,7 +167,7 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> fi
 ```
 
 ```{r}
-lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Quercus")) |> summary()
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = merged_df |> filter(genus == "Quercus")) |> summary()
 ```
 
 ### Populus Species
@@ -193,7 +193,7 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> fi
 ```
 
 ```{r}
-lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Populus")) |> summary()
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = merged_df |> filter(genus == "Populus")) |> summary()
 ```
 
 ### Betula Species
@@ -219,7 +219,7 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> fi
 ```
 
 ```{r}
-lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df |> filter(genus == "Betula")) |> summary()
+lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = merged_df |> filter(genus == "Betula")) |> summary()
 ```
 
 ## Patterns in FLS across species along a latitudinal gradient
