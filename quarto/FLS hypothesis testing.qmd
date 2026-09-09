@@ -240,6 +240,10 @@ fls_genus |>
 ```
 
 ```{r}
+lm(fls ~ latitude, data = fls_genus) |> summary()
+```
+
+```{r}
 
 fls_species <- merged_df |>
   filter(genus == "Acer") |>
