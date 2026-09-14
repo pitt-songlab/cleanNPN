@@ -36,4 +36,19 @@ process_worldclim_climatology <- function(v_var = c("temp", "prcp"), worldclim_d
   }
 }
 
-process_worldclim_climatology()
+process_worldclim_seasonal <- function(v_month = c("03", "04", "05"),worldclim_dir = "alldata/input/WorldClim/annual/", process_dir = "alldata/intermediate/WorldClim/seasonal/") {
+  
+  For (year in 2000:2024) {
+    for (worldclim_var in c("tmin", "tmax")) {
+      worldclim_file <- str_c("wc2.1_cruts4.09_10m_", worldclim_var, "_", year, "-", v_month, ".tif" )
+      
+      worldclim_file_full <- str_c(worldclim_dir,worldclim_var, "/", worldclim_file)
+      
+      worldclim_stack <- terra::rast(worldclim_file_full)
+    }
+    
+  }
+  
+  ...
+}
+
