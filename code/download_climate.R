@@ -28,3 +28,4 @@ download_worldclim_climatology <- function(v_var = c("temp", "prcp"), worldclim_
 download_worldclim_climatology()
 
 # download_worldclim_annual()
+# There are three options, download 10 minutes manually, https://www.worldclim.org/data/monthlywth.html
