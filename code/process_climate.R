@@ -1,6 +1,6 @@
 
 #written by Yiluan Song & Brianna Shepherd
-#Updated September 17, 2026
+#Updated September 21, 2026
 
 library(tidyverse)
 library(terra)
