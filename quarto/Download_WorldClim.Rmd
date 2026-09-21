@@ -1,7 +1,15 @@
+---
+title: "Download_WorldClim"
+author: "Brianna Shepherd"
+date: "2026-09-03"
+output: html_document
+---
 
-#Downloading climate data for FLS
-#Adapted by Brianna Shepherd
-#Updated 9/3/2026
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
 
 #Load packages
 library(tidyverse)
@@ -60,3 +68,5 @@ FLS_locations_with_climate <- coordinate_points %>%
   as_tibble() %>%
   bind_cols(extracted_values) %>%
   select(-ID)
+
+```
