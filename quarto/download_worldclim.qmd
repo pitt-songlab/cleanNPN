@@ -1,13 +1,16 @@
 ---
 title: "Download_WorldClim"
-author: "Brianna Shepherd"
-date: "2026-09-03"
-output: html_document
+author: "Brianna Shepherd and Yiluan Song"
+date: today
+format: html
+editor: visual
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+## Downloading WorldClim Data
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Extracting coordinates
 
 ```{r}
 
@@ -43,9 +46,11 @@ leaf_locations <- leaf |>
 FLS_locations <- rbind(flower_locations, anti_join(flower_locations, leaf_locations, by = c("individual_id")))
 
 write.csv(locations, "/ix/ysong/projects/phenology-FLS/intermediate/FLS_locations.csv")
+```
 
 #Downloading the weather data
 
+```{r}
 clim_var <- c(
   "tmin",
   "tmax",
