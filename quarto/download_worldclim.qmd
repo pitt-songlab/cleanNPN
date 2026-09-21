@@ -1,7 +1,18 @@
+---
+title: "Download_WorldClim"
+author: "Brianna Shepherd and Yiluan Song"
+date: today
+format: html
+editor: visual
+---
 
-#Downloading climate data for FLS
-#Adapted by Brianna Shepherd
-#Updated 9/3/2026
+## Downloading WorldClim Data
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Extracting coordinates
+
+```{r}
 
 #Load packages
 library(tidyverse)
@@ -35,9 +46,11 @@ leaf_locations <- leaf |>
 FLS_locations <- rbind(flower_locations, anti_join(flower_locations, leaf_locations, by = c("individual_id")))
 
 write.csv(locations, "/ix/ysong/projects/phenology-FLS/intermediate/FLS_locations.csv")
+```
 
 #Downloading the weather data
 
+```{r}
 clim_var <- c(
   "tmin",
   "tmax",
@@ -60,3 +73,5 @@ FLS_locations_with_climate <- coordinate_points %>%
   as_tibble() %>%
   bind_cols(extracted_values) %>%
   select(-ID)
+
+```
