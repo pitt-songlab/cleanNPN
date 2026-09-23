@@ -43,13 +43,16 @@ df_leaf <- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 # Clean data
 
 We coded four ways to clean NPN status intensity data.
-- Clean by resolving conflict: a function that groups by observer person ID and year, counts the total observations by said observer in said year. If there are conflicting observations for a phenophase, the observation from the observer with a higher count will be maintained. 
-- Clean by leading no: a function that reviews data for an individual, and counts the number of days since a "no" was last recorded. Number of days can be specified in the function.
-- Clean by trailing yes: a function that reviews data for an individual and counts the number of consecutive "yes" observations.
-- Clean by window: a function that removes any observations after the designated calendar date. 
+- Clean by resolving conflict: a function that groups by observer person ID and year, counts the total observations by an observer in that year. If there are conflicting observations for a phenophase of an individual on the same date, the observation from the observer with a higher total number of observations for that year will be kept. 
+
+- Clean by leading no: a function that reviews observations for an individual, orders them chronologically, and counts the number of days since a "no" was last recorded. The number of days since previous no can be specified using the argument leading_window_days. Observations without a "no" observation within the designated leading window are removed. 
+
+- Clean by trailing yes: a function that reviews data for an individual, orders them chronologically, and counts the number of consecutive "yes" observations. The number of days for a trailing "yes" can be specified using the argument leading_window_days. Observations without a "yes" observation in the trailing window are removed.
+
+- Clean by window: a function that removes any observations within a defined set of dates. The window can be specified using the min_doy and max_doy arguments.  
 
 We coded one function that combines all four ways together. 
-- Clean data: a wrapper function that execute any of the four steps.
+- Clean data: a wrapper function that executes any of the four steps.
 
 Load functions we developed for cleaning NPN status intensity data.
 
