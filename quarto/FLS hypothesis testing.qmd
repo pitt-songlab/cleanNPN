@@ -119,7 +119,7 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df) |> s
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df) |> summary()
 ```
 
-### Maple Species
+### Acer Species
 
 ```{r}
 
@@ -139,7 +139,7 @@ merged_df |>
 
 ```
 
-We removed two maple species because they did not have enough observations (\<3 total across all years)
+We removed two Acer species because they did not have enough observations (\<3 total across all years)
 
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Acer")) |> summary()
@@ -149,7 +149,7 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> fi
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = merged_df |> filter(genus == "Acer")) |> summary()
 ```
 
-### Oak Species
+### Quercus Species
 
 ```{r}
 
@@ -251,6 +251,8 @@ fls_genus |>
 lm(fls ~ latitude, data = fls_genus) |> summary()
 ```
 
+### Acer Genus
+
 ```{r}
 
 fls_species <- merged_df |>
@@ -271,7 +273,7 @@ fls_species |>
 lm(fls ~ latitude, data = fls_species) |> summary()
 ```
 
-Oak
+### Quercus Genus
 
 ```{r}
 fls_species <- merged_df |>
@@ -293,7 +295,7 @@ fls_species |>
 lm(fls ~ latitude, data = fls_species) |> summary()
 ```
 
-Populus
+### Populus Genus
 
 ```{r}
 fls_species <- merged_df |>
@@ -315,7 +317,7 @@ fls_species |>
 lm(fls ~ latitude, data = fls_species) |> summary()
 ```
 
-Betula
+### Betula Genus
 
 ```{r}
 fls_species <- merged_df |>
@@ -338,6 +340,8 @@ lm(fls ~ latitude, data = fls_species) |> summary()
 ```
 
 ## Patterns in FLS across species along a latitudinal gradient
+
+### By Genus
 
 Import annual weather data for each year
 
@@ -377,5 +381,14 @@ fls_genus |>
 lm(fls ~ temperature, data = fls_genus) |> summary()
 
 ```
+### Acer 
+
+### Quercus
+
+### Populus
+
+### Betual
+
+
 
 ## Partition variance in FLS to species and individual level
