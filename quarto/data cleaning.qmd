@@ -43,6 +43,7 @@ df_leaf <- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 # Clean data
 
 We coded four ways to clean NPN status intensity data.
+
 - Clean by resolving conflict: a function that groups by observer person ID and year, counts the total observations by an observer in that year. If there are conflicting observations for a phenophase of an individual on the same date, the observation from the observer with a higher total number of observations for that year will be kept. 
 
 - Clean by leading no: a function that reviews observations for an individual, orders them chronologically, and counts the number of days since a "no" was last recorded. The number of days since previous no can be specified using the argument leading_window_days. Observations without a "no" observation within the designated leading window are removed. 
@@ -52,6 +53,7 @@ We coded four ways to clean NPN status intensity data.
 - Clean by window: a function that removes any observations within a defined set of dates. The window can be specified using the min_doy and max_doy arguments.  
 
 We coded one function that combines all four ways together. 
+
 - Clean data: a wrapper function that executes any of the four steps.
 
 Load functions we developed for cleaning NPN status intensity data.
