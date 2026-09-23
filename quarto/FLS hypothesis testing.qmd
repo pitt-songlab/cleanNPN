@@ -387,7 +387,7 @@ lm(fls ~ temperature, data = fls_genus) |> summary()
 
 ### Populus
 
-### Betual
+### Betula
 
 
 
