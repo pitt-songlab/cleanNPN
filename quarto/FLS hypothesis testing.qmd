@@ -257,7 +257,7 @@ lm(fls ~ latitude, data = fls_genus) |> summary()
 
 fls_species <- merged_df |>
   filter(genus == "Acer") |>
-  group_by(genus, species) |>
+  group_by(species) |>
   summarize(latitude = median(latitude), fls = median(fls))
 
 fls_species |>
@@ -278,7 +278,7 @@ lm(fls ~ latitude, data = fls_species) |> summary()
 ```{r}
 fls_species <- merged_df |>
   filter(genus == "Quercus") |>
-  group_by(genus, species) |>
+  group_by(species) |>
   summarize(latitude = median(latitude), fls = median(fls))
 
 fls_species |>
@@ -300,7 +300,7 @@ lm(fls ~ latitude, data = fls_species) |> summary()
 ```{r}
 fls_species <- merged_df |>
   filter(genus == "Populus") |>
-  group_by(genus, species) |>
+  group_by(species) |>
   summarize(latitude = median(latitude), fls = median(fls))
 
 fls_species |>
@@ -322,7 +322,7 @@ lm(fls ~ latitude, data = fls_species) |> summary()
 ```{r}
 fls_species <- merged_df |>
   filter(genus == "Betula") |>
-  group_by(genus, species) |>
+  group_by(species) |>
   summarize(latitude = median(latitude), fls = median(fls))
 
 fls_species |>
@@ -378,17 +378,80 @@ fls_genus |>
 ```
 
 ```{r}
-lm(fls ~ temperature, data = fls_genus) |> summary()
+lm(fls ~ temperature, data = fls_temp) |> summary()
 
 ```
 ### Acer 
 
+```{r}
+fls_acer <- fls_temp |>
+  filter(genus == "Acer") |>
+  group_by(species) 
+  summarize(temperature = median(temperature), fls = median(fls))
+
+fls_acer |>
+  ggplot(aes(x = temperature, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = species), alpha = 0.5) +
+  geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Temperature", y = "Leaf - Flower")
+```
+
+```{r}
+lm(fls ~ latitude, data = fls_acer) |> summary()
+```
 ### Quercus
 
+```{r}
+fls_quercus <- fls_temp |>
+  filter(genus == "Quercus") |>
+  group_by(species) 
+  summarize(temperature = median(temperature), fls = median(fls))
+
+fls_quercus |>
+  ggplot(aes(x = temperature, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = species), alpha = 0.5) +
+  geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Temperature", y = "Leaf - Flower")
+
+```
 ### Populus
+
+```{r}
+fls_populus <- fls_temp |>
+  filter(genus == "Populus") |>
+  group_by(species) 
+  summarize(temperature = median(temperature), fls = median(fls))
+
+fls_populus |>
+  ggplot(aes(x = temperature, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = species), alpha = 0.5) +
+  geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Temperature", y = "Leaf - Flower")
+
+```
 
 ### Betula
 
+```{r}
+fls_betula <- fls_temp |>
+  filter(genus == "Betula") |>
+  group_by(species) 
+  summarize(temperature = median(temperature), fls = median(fls))
 
+fls_betula |>
+  ggplot(aes(x = temperature, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = species), alpha = 0.5) +
+  geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Temperature", y = "Leaf - Flower")
+
+```
 
 ## Partition variance in FLS to species and individual level
