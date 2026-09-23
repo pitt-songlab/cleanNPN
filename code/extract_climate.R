@@ -32,10 +32,13 @@ raster_path <- str_c("alldata/intermediate/WorldClim/annual/", "temp_030405_", y
 #Create a SpatRaster - a spatially referenced surface divided into three dimensional cells (rows, columns, layers)
 climate_raster <- terra::rast(raster_path)
 
+#Change layer names to match year
+names(climate_raster) <- str_c(year)
+
 #Import file with locations
 library(readr)
-FLS_locations <- read_csv("alldata/intermediate/FLS_locations.csv")
-View(FLS_locations)
+FLS_locations <- read_csv("alldata/intermediate/FLS_locations.csv") |>
+  select(-`...1`)
 
 #Create SpatVector object
 coordinate_points <- terra::vect(
@@ -48,18 +51,23 @@ coordinate_points <- terra::vect(
 extracted_values <- terra::extract(climate_raster, coordinate_points)
 
 #Create data frame with extracted values
-df_coordinates_with_annual <- coordinate_points %>%
-  as_tibble() %>%
-  bind_cols(extracted_values) %>%
+df_coordinates_with_annual <- coordinate_points |>
+  as_tibble() |>
+  bind_cols(extracted_values) |>
   select(-ID)
 
-#9/21 notes - the current version of this just lists the mean for every year as "mean...8", 
-# we need to adjust the code so it names the column header to be the year and mean so it is
-# easier to use in the future
-# it also created an extra column that is unnecessary and needs to be removed
+#Change format of the output dataframe
+df_coordinates_annual_long <- df_coordinates_with_annual %>%
+  pivot_longer(
+    cols = all_of(as.character(year)),
+    names_to = "year",
+    values_to = "temperature"
+  ) %>%
+  mutate(year = as.integer(year))
 
-#Save file to output (?) or maybe intermediate folder?
+#Save files to output (?) folder
 write.csv(df_coordinates_with_annual, "/ix/ysong/projects/phenology-FLS/output/coordinates_with_annualclim.csv")
+write.csv(df_coordinates_annual_long, "/ix/ysong/projects/phenology-FLS/output/coordinates_annualclim_long.csv")
 
 ################################################################################
 
