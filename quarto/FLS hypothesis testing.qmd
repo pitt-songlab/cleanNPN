@@ -360,6 +360,18 @@ fls_temp <- merged_df |>
 
 ```
 
+Explore trends in weather and year
+
+```{r}
+fls_year <- fls_temp |>
+  group_by(year) |>
+  summarize(temperature = median(temperature))
+
+ggplot(fls_year, aes(year, temperature)) +
+  geom_col()
+
+```
+
 ```{r}
 #| fig-width: 8
 #| fig-height: 4
@@ -385,12 +397,15 @@ lm(fls ~ temperature, data = fls_temp) |> summary()
 
 ```{r}
 fls_acer <- fls_temp |>
-  filter(genus == "Acer") |>
-  group_by(species) 
-  summarize(temperature = median(temperature), fls = median(fls))
+  filter(genus == "Acer")
+ 
 
 fls_acer |>
+  group_by(year, species) |>
+  filter(species != "freemanii" & species != "glabrum") |>
+  summarize(temperature = median(temperature), fls = median(fls)) |>
   ggplot(aes(x = temperature, y = fls)) +
+  facet_wrap(~ species, ncol = 3) +
   geom_hline(yintercept = 0) +
   geom_point(aes(col = species), alpha = 0.5) +
   geom_smooth(aes(col = species), method = MASS::rlm, se = F) +
