@@ -1,5 +1,5 @@
 ---
-title: "FLS hypothesis testing"
+title: "Flower-leaf sequence (FLS) hypothesis testing"
 author: "Brianna Shepherd, Yiluan Song"
 date: today
 format: html
@@ -26,7 +26,7 @@ leaf <- read_csv(f_leaf)
 
 ```
 
-# Data Cleaning 
+# Data Cleaning
 
 ## Load functions
 
@@ -40,7 +40,7 @@ source(here::here("code", "clean_by_window.R"))
 
 ## Apply functions
 
-``` {r}
+```{r}
 
 flower_clean <- flower |>
   clean_data(
@@ -62,6 +62,7 @@ leaf_clean <- leaf |>
     max_doy = 213
   )
 ```
+
 #Calculate onset date and flower-leaf sequence
 
 ```{r}
@@ -88,11 +89,12 @@ merged_df <- inner_join(
 
 ```
 
-# Test Hypotheses 
+# Test Hypotheses
 
 ## Patterns in FLS among individuals within species along a latitudinal gradient
 
 ### By Genus
+
 ```{r}
 
 #| fig-width: 12
@@ -112,11 +114,13 @@ merged_df |>
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df) |> summary()
 ```
+
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 + latitude | year), data = merged_df) |> summary()
 ```
 
 ### Maple Species
+
 ```{r}
 
 #| fig-width: 12
@@ -134,11 +138,13 @@ merged_df |>
   theme(legend.position = "none")
 
 ```
-We removed two maple species because they did not have enough observations (<3 total across all years)
+
+We removed two maple species because they did not have enough observations (\<3 total across all years)
 
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species), data = merged_df |> filter(genus == "Acer")) |> summary()
 ```
+
 ```{r}
 lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = merged_df |> filter(genus == "Acer")) |> summary()
 ```
@@ -171,6 +177,7 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = me
 ```
 
 ### Populus Species
+
 ```{r}
 
 #| fig-width: 12
@@ -197,6 +204,7 @@ lmerTest::lmer(fls ~ latitude + (1 + latitude | species) + (1 | year), data = me
 ```
 
 ### Betula Species
+
 ```{r}
 
 #| fig-width: 12
@@ -258,6 +266,7 @@ fls_species |>
   geom_smooth(method = MASS::rlm) +
   labs(x = "Latitude", y = "Leaf - Flower")
 ```
+
 ```{r}
 lm(fls ~ latitude, data = fls_species) |> summary()
 ```
@@ -279,6 +288,7 @@ fls_species |>
   labs(x = "Latitude", y = "Leaf - Flower")
 
 ```
+
 ```{r}
 lm(fls ~ latitude, data = fls_species) |> summary()
 ```
@@ -300,6 +310,7 @@ fls_species |>
   labs(x = "Latitude", y = "Leaf - Flower")
 
 ```
+
 ```{r}
 lm(fls ~ latitude, data = fls_species) |> summary()
 ```
@@ -321,8 +332,50 @@ fls_species |>
   labs(x = "Latitude", y = "Leaf - Flower")
 
 ```
+
 ```{r}
 lm(fls ~ latitude, data = fls_species) |> summary()
+```
+
+## Patterns in FLS across species along a latitudinal gradient
+
+Import annual weather data for each year
+
+```{r}
+coordinates_annualclim_long <- read_csv("alldata/output/coordinates_annualclim_long.csv") |>
+  select(-"...1", -"state", -"genus", -"species")
+View(coordinates_annualclim_long)
+
+```
+
+Join the cleaned dataframe with the imported weather data
+```{r}
+
+fls_temp <- merged_df |>
+  left_join(coordinates_annualclim_long, by = c("individual_id", "year"))
+
+```
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4
+
+fls_genus <- fls_temp |>
+  group_by(genus, year) |>
+  summarize(temperature = median(temperature), fls = median(fls))
+
+fls_genus |>
+  ggplot(aes(x = temperature, y = fls)) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = genus), alpha = 0.5) +
+  geom_smooth(aes(col = genus), method = MASS::rlm, se = F) +
+  geom_smooth(method = MASS::rlm) +
+  labs(x = "Temperature", y = "Leaf - Flower")
+```
+
+```{r}
+lm(fls ~ temperature, data = fls_genus) |> summary()
+
 ```
 
 ## Partition variance in FLS to species and individual level
