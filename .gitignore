@@ -5,6 +5,7 @@ quarto/.quarto/
 quarto/*.html
 quarto/*.pdf
 quarto/*.docx
+quarto/*.rmarkdown
 
 # History files
 .Rhistory

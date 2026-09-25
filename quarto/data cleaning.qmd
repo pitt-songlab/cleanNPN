@@ -40,21 +40,21 @@ df_flower <- read_csv("alldata/input/NPN/flower/Acer/2025.csv") |>
 df_leaf <- read_csv("alldata/input/NPN/leaf/Acer/2025.csv")
 ```
 
+# Data cleaning pipeline
+
+We coded four functions to clean NPN status intensity data.
+
+- Clean by resolving conflict: a function that keeps only one observation for a phenophase of an individual on the same date, resolving conflicts in observations between users. The observation kept is made by the most engaged user, measured by the total observations by an observer in that year, in all years, or with an user-defined grouping. 
+
+- Clean by leading no: a function that reviews observations for an individual and phenophase, removes uncertain status records (-1), deduplicates multiple daily observations by prioritizing "no" (0) over "yes" (1), and calculates the total count of "no" observations recorded in the preceding user-defined window (looking backward from yesterday).
+
+- Clean by trailing yes: a function that reviews observations for an individual and phenophase, removes uncertain status records (-1), deduplicates multiple daily observations by prioritizing "yes" (1) over "no" (0), and calculates the total count of "yes" observations recorded in the subsequent user-defined window (looking forward from tomorrow).
+
+- Clean by window: a function that removes any observations outside a window defined by minimum and maximum day of year.  
+
+We coded a wrapper function (`clean_data`) that executes data cleaning with any of the four steps.
+
 # Clean data
-
-We coded four ways to clean NPN status intensity data.
-
-- Clean by resolving conflict: a function that groups by observer person ID and year, counts the total observations by an observer in that year. If there are conflicting observations for a phenophase of an individual on the same date, the observation from the observer with a higher total number of observations for that year will be kept. 
-
-- Clean by leading no: a function that reviews observations for an individual, orders them chronologically, and counts the number of days since a "no" was last recorded. The number of days since previous no can be specified using the argument leading_window_days. Observations without a "no" observation within the designated leading window are removed. 
-
-- Clean by trailing yes: a function that reviews data for an individual, orders them chronologically, and counts the number of consecutive "yes" observations. The number of days for a trailing "yes" can be specified using the argument leading_window_days. Observations without a "yes" observation in the trailing window are removed.
-
-- Clean by window: a function that removes any observations within a defined set of dates. The window can be specified using the min_doy and max_doy arguments.  
-
-We coded one function that combines all four ways together. 
-
-- Clean data: a wrapper function that executes any of the four steps.
 
 Load functions we developed for cleaning NPN status intensity data.
 
