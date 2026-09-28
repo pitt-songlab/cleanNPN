@@ -56,7 +56,7 @@ df_coordinates_with_annual <- coordinate_points |>
   bind_cols(extracted_values) |>
   select(-ID)
 
-#Change format of the output dataframe
+#Change format of the outputted data frame
 df_coordinates_annual_long <- df_coordinates_with_annual %>%
   pivot_longer(
     cols = all_of(as.character(year)),
@@ -65,7 +65,7 @@ df_coordinates_annual_long <- df_coordinates_with_annual %>%
   ) %>%
   mutate(year = as.integer(year))
 
-#Save files to output (?) folder
+#Save files to intermediate folder
 write.csv(df_coordinates_with_annual, "/ix/ysong/projects/phenology-FLS/intermediate/coordinates_with_annualclim.csv")
 write.csv(df_coordinates_annual_long, "/ix/ysong/projects/phenology-FLS/intermediate/coordinates_annualclim_long.csv")
 
