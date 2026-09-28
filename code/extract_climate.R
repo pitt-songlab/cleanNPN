@@ -66,8 +66,8 @@ df_coordinates_annual_long <- df_coordinates_with_annual %>%
   mutate(year = as.integer(year))
 
 #Save files to output (?) folder
-write.csv(df_coordinates_with_annual, "/ix/ysong/projects/phenology-FLS/output/coordinates_with_annualclim.csv")
-write.csv(df_coordinates_annual_long, "/ix/ysong/projects/phenology-FLS/output/coordinates_annualclim_long.csv")
+write.csv(df_coordinates_with_annual, "/ix/ysong/projects/phenology-FLS/intermediate/coordinates_with_annualclim.csv")
+write.csv(df_coordinates_annual_long, "/ix/ysong/projects/phenology-FLS/intermediate/coordinates_annualclim_long.csv")
 
 ################################################################################
 
