@@ -52,11 +52,21 @@
 #' }
 #'
 #' @export
-clean_by_leading_no <- function(data, leading_window_days = 7) {
+clean_by_leading_no <- function(data, leading_window_days = 7, prioritize = "no") {
   data_clean <- data |>
-    dplyr::filter(phenophase_status != -1) |>
-    # keep one obs per day, no over yes
-    dplyr::arrange(individual_id, phenophase_id, observation_date, phenophase_status) |>
+    dplyr::filter(phenophase_status != -1)
+
+  if (prioritize == "no") {
+    data_clean <- data_clean |>
+      # keep one obs per day, no over yes
+      dplyr::arrange(individual_id, phenophase_id, observation_date, phenophase_status)
+  } else if (prioritize == "yes") {
+    data_clean <- data_clean |>
+      # keep one obs per day, yes over no
+      dplyr::arrange(individual_id, phenophase_id, observation_date, desc(phenophase_status))
+  }
+
+  data_clean <- data_clean |>
     dplyr::distinct(individual_id, phenophase_id, observation_date, .keep_all = T) |>
     dplyr::group_by(individual_id, phenophase_id) |>
     dplyr::arrange(observation_date, .by_group = TRUE) |>
