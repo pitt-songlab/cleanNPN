@@ -1,7 +1,7 @@
 
 clean_by_trailing_yes <- function(data, trailing_window_days = 7, prioritize = "yes") {
   data_clean <- data |>
-    dplyr::filter(phenophase_status != -1) |>
+    dplyr::filter(phenophase_status != -1)
 
     if (prioritize == "yes") {
       data_clean <- data_clean |>
