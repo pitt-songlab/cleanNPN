@@ -12,83 +12,14 @@ download_test_data <- function(phenophase = c("leaf", "flower")) {
   pheno_class_id <- switch(
     phenophase,
     leaf = 3,
-    flower = c(7,8)
+    flower = 7
   )
 
-  rnpn::npn_download_status_data(
-    request_source = "package_example_dataset_cleanNPN",
-    years = 2025,
-    species_ids = spid,
-    pheno_class_ids = phenophase_class_id,
-    additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID",
-                           "Multiple_Observers", "Observed_Status_Conflict_Flag",
-                           "Naturalist_Skill_Level")
-  )
-
+    rnpn::npn_download_status_data(
+      request_source = "package_example_dataset_cleanNPN",
+      years = 2025,
+      species_ids = spid,
+      pheno_class_ids = pheno_class_id,
+      additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID")
+    )
 }
-download_test_data("leaf")
-
-###
-for (genusoi in genus_list) {
-  spid <- species_list |>
-    filter(genus == genusoi) |>
-    select(species_id) |>
-    unique()
-
-  for (year in year_list) {
-    npn_leaf_df <- rnpn::npn_download_status_data(
-      request_source = "YS",
-      years = year,
-      species_ids = spid$species_id,
-      pheno_class_ids = 3,
-      additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag", "Naturalist_Skill_Level")
-    )
-
-    if (nrow(npn_leaf_df) > 0) {
-      file <- str_c(data_path, "leaf", "/", genusoi, "/", year, ".csv")
-      dir.create(dirname(file), recursive = T, showWarnings = F)
-
-      write.csv(
-        x = npn_leaf_df,
-        file = file,
-        row.names = FALSE,
-        quote = TRUE
-      )
-
-      print(file)
-    }
-  }
-
-  for (year in year_list) {
-    npn_flower_df_1 <- rnpn::npn_download_status_data(
-      request_source = "YS",
-      years = year,
-      species_ids = spid$species_id,
-      pheno_class_ids = 7,
-      additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag", "Naturalist_Skill_Level")
-    )
-    npn_flower_df_2 <- rnpn::npn_download_status_data(
-      request_source = "YS",
-      years = year,
-      species_ids = spid$species_id,
-      pheno_class_ids = 8,
-      additional_fields = c("ObservedBy_Person_ID", "Site_Name", "Dataset_ID", "Multiple_Observers", "Observed_Status_Conflict_Flag", "Naturalist_Skill_Level")
-    )
-    npn_flower_df <- rbind(npn_flower_df_1, npn_flower_df_2)
-
-    if (nrow(npn_flower_df) > 0) {
-      file <- str_c(data_path, "flower", "/", genusoi, "/", year, ".csv")
-      dir.create(dirname(file), recursive = T, showWarnings = F)
-
-      write.csv(
-        x = npn_flower_df,
-        file = file,
-        row.names = FALSE,
-        quote = TRUE
-      )
-
-      print(file)
-    }
-  }
-}
-
