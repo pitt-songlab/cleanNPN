@@ -1,6 +1,6 @@
 #' Calculate the first "yes" observation per individual, phenophase, and year
 #'
-#' Reduces phenophase observation data to a single record for each
+#' Reduces NPN Status and Intensity data to a single record for each
 #' combination of individual, phenophase, and calendar year: the earliest
 #' "yes" observation, as measured by day of year. This is commonly used to
 #' derive the onset date of a phenophase (e.g., first leaf, first flower)
