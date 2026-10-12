@@ -57,6 +57,20 @@
 #' # Only an upper limit
 #' clean_by_window(obs, max_doy = 100)
 #'
+#' # Records with NA in day_of_year are always dropped
+#' obs_na <- data.frame(
+#'   individual_id = 1,
+#'   phenophase_id = 501,
+#'   day_of_year = c(10, NA, 100, NA, 200, 300),
+#'   phenophase_status = c(0, 1, 1, 0, 1, 0)
+#' )
+#'
+#' # The two NA rows are removed along with the days outside the window
+#' clean_by_window(obs_na, min_doy = 60, max_doy = 200)
+#'
+#' # NA rows are removed even when both bounds are NULL
+#' clean_by_window(obs_na)
+#'
 #' @export
 clean_by_window <- function(data, min_doy = NULL, max_doy = NULL) {
   if (is.null(min_doy)) {
