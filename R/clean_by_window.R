@@ -67,7 +67,7 @@ clean_by_window <- function(data, min_doy = NULL, max_doy = NULL) {
   if (is.null(max_doy)) {
     max_doy <- Inf
   }
-  data_clean <- data %>%
+  data_clean <- data |>
     dplyr::filter(
       day_of_year >= min_doy,
       day_of_year <= max_doy

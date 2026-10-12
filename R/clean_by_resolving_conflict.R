@@ -129,7 +129,7 @@ clean_by_resolving_conflict <- function(data, calculate_observation_option = c("
     dplyr::filter(phenophase_status != -1, !is.na(phenophase_status)) |>
     # keep the observation from the observer with the most observations
     dplyr::group_by(individual_id, phenophase_id, observation_date) |>
-    dplyr::slice_max(num_of_observations, n = 1, with_ties = T) %>%
+    dplyr::slice_max(num_of_observations, n = 1, with_ties = T) |>
     dplyr::ungroup()
 
   return(data_clean)
