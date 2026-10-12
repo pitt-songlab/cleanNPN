@@ -2,9 +2,8 @@ Package: cleanNPN
 Title: Clean NPN
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Brianna", "Shepherd", , "bls227@pitt.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0009-6338-0454"), affiliation = "Biological Sciences Department, Univeristy of Pittsburgh, Pittsburgh, PA, USA"),
-    person("Yiluan", "Song", , "yiluansong@pitt.edu", role = c("aut"), comment = c(ORCID = "0000-0003-3660-3797"), affiliation = "Biological Sciences Department, Univeristy of Pittsburgh, Pittsburgh, PA, USA")
-)
+    person("Brianna", "Shepherd", email= "bls227@pitt.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0009-6338-0454", affiliation = "Biological Sciences Department, Univeristy of Pittsburgh, Pittsburgh, PA, USA")),
+    person("Yiluan", "Song", email= "yiluansong@pitt.edu", role = c("aut"), comment = c(ORCID = "0000-0003-3660-3797", affiliation = "Biological Sciences Department, Univeristy of Pittsburgh, Pittsburgh, PA, USA")))
 Description: The `cleanNPN` R package provides a reproducible workflow for processing National Phenology Network (NPN) status and intensity phenological data, enabling researchers to quickly clean raw datasets using a suite of built-in functions. 
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
