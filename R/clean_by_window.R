@@ -25,8 +25,6 @@
 #'     years. Because the same day of year corresponds to different calendar
 #'     dates in leap and non-leap years, dates after February can differ by
 #'     one day between years.
-#'   \item The function does not modify any columns, and the input's
-#'     grouping is preserved if `data` is a grouped data frame.
 #' }
 #'
 #' @param data A data frame or tibble of phenophase observations. Must contain
