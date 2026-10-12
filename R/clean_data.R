@@ -119,7 +119,6 @@
 #'   min_doy = 60, max_doy = 200
 #' )
 #'
-#' @importFrom dplyr filter
 #' @export
 clean_data <- function(data,
                        calculate_observation_option = NULL,

@@ -10,11 +10,11 @@ clean_by_leading_no <- function(data, leading_window_days = 7, prioritize = "no"
   } else if (prioritize == "yes") {
     data_clean <- data_clean |>
       # keep one obs per day, yes over no
-      dplyr::arrange(individual_id, phenophase_id, observation_date, desc(phenophase_status))
+      dplyr::arrange(individual_id, phenophase_id, observation_date, dplyr::desc(phenophase_status))
   }
 
   data_clean <- data_clean |>
-    dplyr::distinct(individual_id, phenophase_id, observation_date, .keep_all = T) |>
+    dplyr::distinct(individual_id, phenophase_id, observation_date, .keep_all = TRUE) |>
     dplyr::group_by(individual_id, phenophase_id) |>
     dplyr::arrange(observation_date, .by_group = TRUE) |>
     # Look backward from the window limit up to yesterday (.i = obsdate - 1)

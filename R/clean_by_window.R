@@ -59,7 +59,6 @@
 #' # Only an upper limit
 #' clean_by_window(obs, max_doy = 100)
 #'
-#' @importFrom dplyr filter
 #' @export
 clean_by_window <- function(data, min_doy = NULL, max_doy = NULL) {
   if (is.null(min_doy)) {

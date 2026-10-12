@@ -84,19 +84,17 @@
 #'
 #' calc_first_yes(obs)
 #'
-#' @importFrom dplyr select filter mutate group_by arrange slice ungroup rename
-#' @importFrom lubridate year
 #' @export
 calc_first_yes <- function(data) {
   data |>
-    select(-intensity_category_id, -intensity_value, - abundance_value) |>
-    filter(phenophase_status == 1) |>
-    select(-phenophase_status) |>
-    mutate(year = lubridate::year(observation_date) ) |>
-    group_by(individual_id, phenophase_id, year ) |>
-    arrange(day_of_year) |>
-    slice(1) |>
-    ungroup() |>
-    rename(day_of_first_yes = day_of_year) |>
-    select(-observation_date, -observation_id, -update_datetime)
+    dplyr::select(-intensity_category_id, -intensity_value, - abundance_value) |>
+    dplyr::filter(phenophase_status == 1) |>
+    dplyr::select(-phenophase_status) |>
+    dplyr::mutate(year = lubridate::year(observation_date) ) |>
+    dplyr::group_by(individual_id, phenophase_id, year ) |>
+    dplyr::arrange(day_of_year) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup() |>
+    dplyr::rename(day_of_first_yes = day_of_year) |>
+    dplyr::select(-observation_date, -observation_id, -update_datetime)
 }

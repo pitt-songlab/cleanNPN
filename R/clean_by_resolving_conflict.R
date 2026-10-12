@@ -102,9 +102,6 @@
 #'   calculate_observation_by = "site_id"
 #' )
 #'
-#' @importFrom dplyr mutate group_by ungroup filter slice_max n
-#' @importFrom lubridate year
-#' @importFrom rlang syms
 #' @export
 clean_by_resolving_conflict <- function(data, calculate_observation_option = c("by_year", "all_years", "other"), calculate_observation_by = NULL) {
   #set which columns to group observation data by
@@ -125,8 +122,8 @@ clean_by_resolving_conflict <- function(data, calculate_observation_option = c("
     #change observation_date to proper formatting
     dplyr::mutate(year = lubridate::year(observation_date)) |>
     # count number of observations for each observer
-    dplyr::group_by(!!!syms(group_vars)) |>
-    dplyr::mutate(num_of_observations = n()) |>
+    dplyr::group_by(!!!rlang::syms(group_vars)) |>
+    dplyr::mutate(num_of_observations = dplyr::n()) |>
     dplyr::ungroup() |>
     #remove any uncertain observations from the dataframe
     dplyr::filter(phenophase_status != -1, !is.na(phenophase_status)) |>
