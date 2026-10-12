@@ -31,10 +31,6 @@
 #'     `slice_min(with_ties = TRUE)`. Any other columns that differ between
 #'     those records (e.g., `observedby_person_id`) will reflect only the
 #'     retained row.
-#'   \item The `observation_date`, `observation_id`, and `update_datetime`
-#'     columns are removed, so the output no longer identifies the specific
-#'     source record. Use `day_of_first_yes` and `year` to reconstruct the
-#'     date if needed.
 #'   \item Because the first "yes" is chosen by `day_of_year` within a
 #'     calendar year, it does not account for phenophases that span the
 #'     turn of the year.
