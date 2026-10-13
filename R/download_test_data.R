@@ -51,7 +51,7 @@
 #' @seealso [rnpn::npn_download_status_data()], [clean_data()]
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Requires an internet connection
 #' leaf_obs <- download_test_data("leaf")
 #' head(leaf_obs)
@@ -68,9 +68,9 @@
 #'
 #' @export
 download_test_data <- function(phenophase = c("leaf", "flower")) {
-  phenophase <- match.arg(phenophase) #ensure no typos that result in silent failure
+  phenophase <- match.arg(phenophase) # ensure no typos that result in silent failure
 
-  spid <- 3 #NPN species ID for Red maple
+  spid <- 3 # NPN species ID for Red maple
 
   pheno_class_id <- switch(
     phenophase,

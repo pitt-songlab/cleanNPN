@@ -58,7 +58,7 @@ is allowed (e.g., \code{"lea"}).
 }
 }
 \examples{
-\donttest{
+\dontrun{
 # Requires an internet connection
 leaf_obs <- download_test_data("leaf")
 head(leaf_obs)
