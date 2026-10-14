@@ -1,5 +1,6 @@
 
-clean_by_leading_no <- function(data, leading_window_days = 7, prioritize = "no") {
+clean_by_leading_no <- function(data, leading_window_days = 7, prioritize = c("no", "yes")) {
+  prioritize <- match.arg(prioritize)
   data_clean <- data |>
     dplyr::filter(phenophase_status != -1)
 
