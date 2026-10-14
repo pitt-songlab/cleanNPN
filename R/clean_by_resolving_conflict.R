@@ -30,8 +30,9 @@
 #'     (`observedby_person_id` only).}
 #'   \item{`"other"`}{Counts per observer within the additional grouping
 #'     column(s) given in `calculate_observation_by` (e.g., a site column).
-#'     `observedby_person_id` is always included automatically. The derived
-#'     `year` column may be used here.}
+#'     `calculate_observation_by` is required for this option; an error is
+#'     thrown if it is `NULL`. `observedby_person_id` is always included
+#'     automatically. The derived `year` column may be used here.}
 #' }
 #'
 #' **Important notes:**
@@ -61,12 +62,13 @@
 #'   }
 #' @param calculate_observation_option A character string specifying how each
 #'   observer's number of observations is calculated. One of `"by_year"`
-#'   (the default), `"all_years"`, or `"other"`. See Details.
+#'   (the default), `"all_years"`, or `"other"`. If `"other"`,
+#'   `calculate_observation_by` must also be supplied. See Details.
 #' @param calculate_observation_by A character vector of column name(s) in
 #'   `data` used to group observations when
-#'   `calculate_observation_option = "other"`. Ignored for the other options.
-#'   If `NULL` (the default) with `"other"`, observations are counted per
-#'   observer only. Defaults to `NULL`.
+#'   `calculate_observation_option = "other"`. Required for `"other"`; an
+#'   error is thrown if it is `NULL`. Ignored for the other options.
+#'   Defaults to `NULL`.
 #'
 #' @return An ungrouped tibble containing the filtered observations with all
 #'   original columns plus:
@@ -102,9 +104,21 @@
 #'   calculate_observation_by = "site_id"
 #' )
 #'
+#' #' # "other" requires calculate_observation_by, so this raises an error
+#' try(clean_by_resolving_conflict(obs, calculate_observation_option = "other"))
+#'
 #' @export
 clean_by_resolving_conflict <- function(data, calculate_observation_option = c("by_year", "all_years", "other"), calculate_observation_by = NULL) {
   calculate_observation_option <- match.arg(calculate_observation_option)
+
+  #validate calculate_observation_by when option is "other"
+  if(calculate_observation_option == "other" && is.null(calculate_observation_by)) {
+    stop(
+      "`calculate_observation_by` must be provided when ",
+      "`calculate_observation_option = \"other\"`."
+    )
+  }
+
   # set which columns to group observation data by
   if (calculate_observation_option == "by_year") {
     group_vars <- c("observedby_person_id", "year")
