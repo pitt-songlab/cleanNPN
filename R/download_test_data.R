@@ -1,6 +1,6 @@
 #' Download example phenology data for red maple from the USA-NPN
 #'
-#' Downloads a year of individual phenometric-ready status-and-intensity
+#' Downloads one year (2025) of individual phenophase status and intensity
 #' records for red maple (*Acer rubrum*) from the USA National Phenology
 #' Network (USA-NPN) using the \pkg{rnpn} package. It is intended for
 #' generating example data to demonstrate and test the cleaning functions in
