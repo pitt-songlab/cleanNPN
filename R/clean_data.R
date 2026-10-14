@@ -84,10 +84,10 @@
 #'   to leave that bound open. If both are `NULL` (the default), the window
 #'   step is skipped.
 #'
-#' @return An ungrouped tibble of the retained observations. Depending on
+#' @return A tibble of the retained observations. Depending on
 #'   which steps ran, it contains all original columns plus some of:
 #'   \describe{
-#'     \item{`year`, `num_of_observations`}{Added when conflicts are resolved.}
+#'     \item{`num_of_observations`}{Added when conflicts are resolved.}
 #'     \item{`leading_no_count`}{Added when the leading "no" step runs.}
 #'     \item{`trailing_yes_count`}{Added when the trailing "yes" step runs.}
 #'   }

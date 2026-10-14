@@ -34,10 +34,9 @@ If \code{NULL} (the default) with \code{"other"}, observations are counted per
 observer only. Defaults to \code{NULL}.}
 }
 \value{
-An ungrouped tibble containing the filtered observations with all
+A tibble containing the filtered observations with all
 original columns plus:
 \describe{
-\item{\code{year}}{Integer year extracted from \code{observation_date}.}
 \item{\code{num_of_observations}}{Number of observations attributed to the
 record's observer within the grouping defined by
 \code{calculate_observation_option}.}

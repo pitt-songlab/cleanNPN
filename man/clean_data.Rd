@@ -58,10 +58,10 @@ to leave that bound open. If both are \code{NULL} (the default), the window
 step is skipped.}
 }
 \value{
-An ungrouped tibble of the retained observations. Depending on
+A tibble of the retained observations. Depending on
 which steps ran, it contains all original columns plus some of:
 \describe{
-\item{\code{year}, \code{num_of_observations}}{Added when conflicts are resolved.}
+\item{\code{num_of_observations}}{Added when conflicts are resolved.}
 \item{\code{leading_no_count}}{Added when the leading "no" step runs.}
 \item{\code{trailing_yes_count}}{Added when the trailing "yes" step runs.}
 }

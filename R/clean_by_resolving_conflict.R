@@ -9,12 +9,15 @@
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'   \item Counts how many observations each observer has made, using the
-#'     grouping set by `calculate_observation_option`.
-#'   \item Removes observations with an unknown or missing status.
-#'   \item When multiple observers recorded the same individual, phenophase,
-#'     and date, keeps the record from the observer with the most
-#'     observations.
+#'   \item Derives a `year` column from `observation_date`.
+#'   \item Counts the number of observations made by each observer, within
+#'     groups determined by `calculate_observation_option`, and stores the
+#'     result in `num_of_observations`.
+#'   \item Removes records where `phenophase_status` is `-1` (unknown/uncertain)
+#'     or `NA`.
+#'   \item For each combination of `individual_id`, `phenophase_id`, and
+#'     `observation_date`, keeps the record(s) with the highest
+#'     `num_of_observations`.
 #' }
 #'
 #' **Choosing how observations are counted.** The `calculate_observation_option`
@@ -27,9 +30,8 @@
 #'     (`observedby_person_id` only).}
 #'   \item{`"other"`}{Counts per observer within the additional grouping
 #'     column(s) given in `calculate_observation_by` (e.g., a site column).
-#'     `calculate_observation_by` is required for this option; an error is
-#'     thrown if it is `NULL`. `observedby_person_id` is always included
-#'     automatically. The derived `year` column may be used here.}
+#'     `observedby_person_id` is always included automatically. The derived
+#'     `year` column may be used here.}
 #' }
 #'
 #' **Important notes:**
@@ -43,6 +45,7 @@
 #'   \item Records with no conflict (only one observer for that individual,
 #'     phenophase, and date) are always retained, provided their status is
 #'     known.
+#'   \item Any existing `year` column in `data` is overwritten.
 #' }
 #'
 #' @param data A data frame or tibble of phenophase observations. Must contain
@@ -58,13 +61,20 @@
 #'   }
 #' @param calculate_observation_option A character string specifying how each
 #'   observer's number of observations is calculated. One of `"by_year"`
-#'   (the default), `"all_years"`, or `"other"`. If `"other"`,
-#'   `calculate_observation_by` must also be supplied. See Details.
+#'   (the default), `"all_years"`, or `"other"`. See Details.
 #' @param calculate_observation_by A character vector of column name(s) in
 #'   `data` used to group observations when
-#'   `calculate_observation_option = "other"`. Required for `"other"`; an
-#'   error is thrown if it is `NULL`. Ignored for the other options.
-#'   Defaults to `NULL`.
+#'   `calculate_observation_option = "other"`. Ignored for the other options.
+#'   If `NULL` (the default) with `"other"`, observations are counted per
+#'   observer only. Defaults to `NULL`.
+#'
+#' @return A tibble containing the filtered observations with all
+#'   original columns plus:
+#'   \describe{
+#'     \item{`num_of_observations`}{Number of observations attributed to the
+#'       record's observer within the grouping defined by
+#'       `calculate_observation_option`.}
+#'   }
 #'
 #' @examples
 #' obs <- data.frame(
@@ -91,21 +101,9 @@
 #'   calculate_observation_by = "site_id"
 #' )
 #'
-#' #' # "other" requires calculate_observation_by, so this raises an error
-#' try(clean_by_resolving_conflict(obs, calculate_observation_option = "other"))
-#'
 #' @export
 clean_by_resolving_conflict <- function(data, calculate_observation_option = c("by_year", "all_years", "other"), calculate_observation_by = NULL) {
   calculate_observation_option <- match.arg(calculate_observation_option)
-
-  #validate calculate_observation_by when option is "other"
-  if(calculate_observation_option == "other" && is.null(calculate_observation_by)) {
-    stop(
-      "`calculate_observation_by` must be provided when ",
-      "`calculate_observation_option = \"other\"`."
-    )
-  }
-
   # set which columns to group observation data by
   if (calculate_observation_option == "by_year") {
     group_vars <- c("observedby_person_id", "year")
@@ -132,7 +130,8 @@ clean_by_resolving_conflict <- function(data, calculate_observation_option = c("
     # keep the observation from the observer with the most observations
     dplyr::group_by(individual_id, phenophase_id, observation_date) |>
     dplyr::slice_max(num_of_observations, n = 1, with_ties = T) |>
-    dplyr::ungroup()
+    dplyr::ungroup() |>
+    dplyr::select(-year)
 
   return(data_clean)
 }

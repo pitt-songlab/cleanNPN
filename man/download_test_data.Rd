@@ -19,7 +19,7 @@ It includes the standard USA-NPN columns (such as \code{individual_id},
 \code{dataset_id}.
 }
 \description{
-Downloads a year of individual phenometric-ready status-and-intensity
+Downloads one year (2025) of individual phenophase status and intensity
 records for red maple (\emph{Acer rubrum}) from the USA National Phenology
 Network (USA-NPN) using the \pkg{rnpn} package. It is intended for
 generating example data to demonstrate and test the cleaning functions in
@@ -33,8 +33,7 @@ is the phenophase:
 \item \strong{Year:} 2025.
 \item \strong{Additional fields:} \code{ObservedBy_Person_ID}, \code{Site_Name}, and
 \code{Dataset_ID}, requested in addition to the default columns returned
-by \code{\link[rnpn:npn_download_status_data]{rnpn::npn_download_status_data()}}. \code{ObservedBy_Person_ID} is needed
-by \code{\link[=clean_by_resolving_conflict]{clean_by_resolving_conflict()}} and \code{\link[=clean_data]{clean_data()}}.
+by \code{\link[rnpn:npn_download_status_data]{rnpn::npn_download_status_data()}}.
 \item \strong{Request source:} \code{"package_example_dataset_cleanNPN"}, which
 identifies the download to the USA-NPN as coming from this package.
 }
@@ -52,9 +51,6 @@ time depending on the size of the request and the USA-NPN server load.
 \item The USA-NPN database is updated continuously, so repeated calls may
 return different records (for example, late-submitted or revised
 observations).
-\item \code{phenophase} is validated with \code{\link[=match.arg]{match.arg()}}, so an unrecognized
-value produces an error rather than a silent failure. Partial matching
-is allowed (e.g., \code{"lea"}).
 }
 }
 \examples{

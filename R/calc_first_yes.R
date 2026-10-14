@@ -12,19 +12,15 @@
 #' result, individual-phenophase-year combinations with no "yes" records do not
 #' appear in the output.
 #'
-#' The year is derived from `observation_date`, and the earliest record is
-#' chosen by `day_of_year`. If an individual has multiple "yes" records on the
+#' If an individual has multiple "yes" records on the
 #' same day of year within a group, they share the same `day_of_first_yes`, so
 #' the result is unaffected by which one is kept.
 #'
 #' @param data A data frame or tibble of phenology observations. Must contain
 #'   the following columns:
 #'   \describe{
-#'     \item{observation_id}{Unique identifier for each observation.}
-#'     \item{species_id}{Identifier for the species.}
 #'     \item{individual_id}{Identifier for the individual organism.}
 #'     \item{phenophase_id}{Identifier for the phenophase.}
-#'     \item{phenophase_description}{Text description of the phenophase.}
 #'     \item{observation_date}{Date of the observation. Must be of class
 #'       `Date` (or otherwise compatible with [lubridate::year()]).}
 #'     \item{day_of_year}{Numeric day of year (1-366) of the observation.}
@@ -36,13 +32,9 @@
 #' @return A tibble with one row per `individual_id`, `phenophase_id`, and
 #'   `year` combination, with the following columns:
 #'   \describe{
-#'     \item{phenophase_id}{Identifier for the phenophase.}
-#'     \item{individual_id}{Identifier for the individual organism.}
-#'     \item{year}{Calendar year, derived from `observation_date`.}
 #'     \item{day_of_first_yes}{Day of year of the earliest "yes" observation
 #'       (renamed from `day_of_year`).}
 #'   }
-#'   The result is ungrouped.
 #'
 #' @examples
 #' obs <- data.frame(
@@ -63,7 +55,7 @@
 #' @export
 calc_first_yes <- function(data) {
   data |>
-    dplyr::select(observation_id, species_id, individual_id, phenophase_id, phenophase_description, observation_date, day_of_year, phenophase_status) |>
+    dplyr::select(individual_id, phenophase_id, observation_date, day_of_year, phenophase_status) |>
     dplyr::filter(phenophase_status == 1) |>
     dplyr::mutate(year = lubridate::year(observation_date) ) |>
     dplyr::group_by(individual_id, phenophase_id, year ) |>
