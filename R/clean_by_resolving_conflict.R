@@ -69,15 +69,6 @@
 #'   error is thrown if it is `NULL`. Ignored for the other options.
 #'   Defaults to `NULL`.
 #'
-#' @return An ungrouped tibble containing the filtered observations with all
-#'   original columns plus:
-#'   \describe{
-#'     \item{`year`}{Integer year extracted from `observation_date`.}
-#'     \item{`num_of_observations`}{Number of observations attributed to the
-#'       record's observer within the grouping defined by
-#'       `calculate_observation_option`.}
-#'   }
-#'
 #' @examples
 #' obs <- data.frame(
 #'   individual_id = 1,
