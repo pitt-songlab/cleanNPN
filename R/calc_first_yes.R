@@ -1,9 +1,10 @@
 #' Calculate the first "yes" observation for each individual, phenophase, and year
 #'
 #' For each combination of individual plant or animal, phenophase, and calendar
-#' year, finds the earliest observation in which the phenophase was recorded
-#' as present (a "yes"). This is commonly used to estimate the onset date of a
-#' phenophase such as first leaf, first flower, or first fruit.
+#' year, finds the day of year of the earliest observation in which the
+#' phenophase was recorded as present (a "yes"). This is commonly used to
+#' estimate the onset date of a phenophase such as first leaf, first flower,
+#' or first fruit.
 #'
 #' Only records with `phenophase_status == 1` are considered. Records with
 #' other values (e.g., `0` for "no" or `-1` for "uncertain") and records with
@@ -13,8 +14,8 @@
 #'
 #' The year is derived from `observation_date`, and the earliest record is
 #' chosen by `day_of_year`. If an individual has multiple "yes" records on the
-#' same day of year within a group, the first one encountered in the input
-#' is returned.
+#' same day of year within a group, they share the same `day_of_first_yes`, so
+#' the result is unaffected by which one is kept.
 #'
 #' @param data A data frame or tibble of phenology observations. Must contain
 #'   the following columns:
@@ -33,11 +34,15 @@
 #'   Any additional columns are discarded.
 #'
 #' @return A tibble with one row per `individual_id`, `phenophase_id`, and
-#'   `year` combination, containing the earliest "yes" observation. Columns are:
-#'   `observation_id`, `species_id`, `individual_id`, `phenophase_id`,
-#'   `phenophase_description`, `observation_date`, `day_of_first_yes`
-#'   (renamed from `day_of_year`), `phenophase_status`, and `year`
-#'   (derived from `observation_date`). The result is ungrouped.
+#'   `year` combination, with the following columns:
+#'   \describe{
+#'     \item{phenophase_id}{Identifier for the phenophase.}
+#'     \item{individual_id}{Identifier for the individual organism.}
+#'     \item{year}{Calendar year, derived from `observation_date`.}
+#'     \item{day_of_first_yes}{Day of year of the earliest "yes" observation
+#'       (renamed from `day_of_year`).}
+#'   }
+#'   The result is ungrouped.
 #'
 #' @examples
 #' obs <- data.frame(
@@ -64,5 +69,7 @@ calc_first_yes <- function(data) {
     dplyr::group_by(individual_id, phenophase_id, year ) |>
     dplyr::arrange(day_of_year) |>
     dplyr::slice(1) |>
-    dplyr::rename(day_of_first_yes = day_of_year)
+    dplyr::rename(day_of_first_yes = day_of_year) |>
+    dplyr::ungroup () |>
+    dplyr::select(phenophase_id, individual_id, year, day_of_first_yes)
 }
