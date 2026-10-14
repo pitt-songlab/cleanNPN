@@ -85,7 +85,6 @@ calc_first_yes <- function(data) {
   data |>
     dplyr::select(-intensity_category_id, -intensity_value, - abundance_value) |>
     dplyr::filter(phenophase_status == 1) |>
-    dplyr::select(-phenophase_status) |>
     dplyr::mutate(year = lubridate::year(observation_date) ) |>
     dplyr::group_by(individual_id, phenophase_id, year ) |>
     dplyr::arrange(day_of_year) |>
