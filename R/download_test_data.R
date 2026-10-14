@@ -14,8 +14,7 @@
 #'   \item **Year:** 2025.
 #'   \item **Additional fields:** `ObservedBy_Person_ID`, `Site_Name`, and
 #'     `Dataset_ID`, requested in addition to the default columns returned
-#'     by [rnpn::npn_download_status_data()]. `ObservedBy_Person_ID` is needed
-#'     by [clean_by_resolving_conflict()] and [clean_data()].
+#'     by [rnpn::npn_download_status_data()].
 #'   \item **Request source:** `"package_example_dataset_cleanNPN"`, which
 #'     identifies the download to the USA-NPN as coming from this package.
 #' }
