@@ -9,15 +9,12 @@
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'   \item Derives a `year` column from `observation_date`.
-#'   \item Counts the number of observations made by each observer, within
-#'     groups determined by `calculate_observation_option`, and stores the
-#'     result in `num_of_observations`.
-#'   \item Removes records where `phenophase_status` is `-1` (unknown/uncertain)
-#'     or `NA`.
-#'   \item For each combination of `individual_id`, `phenophase_id`, and
-#'     `observation_date`, keeps the record(s) with the highest
-#'     `num_of_observations`.
+#'   \item Counts how many observations each observer has made, using the
+#'     grouping set by `calculate_observation_option`.
+#'   \item Removes observations with an unknown or missing status.
+#'   \item When multiple observers recorded the same individual, phenophase,
+#'     and date, keeps the record from the observer with the most
+#'     observations.
 #' }
 #'
 #' **Choosing how observations are counted.** The `calculate_observation_option`
