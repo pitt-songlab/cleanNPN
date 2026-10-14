@@ -32,9 +32,6 @@
 #'   \item The USA-NPN database is updated continuously, so repeated calls may
 #'     return different records (for example, late-submitted or revised
 #'     observations).
-#'   \item `phenophase` is validated with [match.arg()], so an unrecognized
-#'     value produces an error rather than a silent failure. Partial matching
-#'     is allowed (e.g., `"lea"`).
 #' }
 #'
 #' @param phenophase A character string specifying which phenophase class to
