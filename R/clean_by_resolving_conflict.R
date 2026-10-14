@@ -46,7 +46,6 @@
 #'   \item Records with no conflict (only one observer for that individual,
 #'     phenophase, and date) are always retained, provided their status is
 #'     known.
-#'   \item Any existing `year` column in `data` is overwritten.
 #' }
 #'
 #' @param data A data frame or tibble of phenophase observations. Must contain
