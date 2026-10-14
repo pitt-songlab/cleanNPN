@@ -14,4 +14,7 @@ Depends:
     R (>= 4.1),
 Imports:
     dplyr,
-    lubridate
+    lubridate,
+    rnpn,
+    slider,
+    rlang
