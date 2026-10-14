@@ -64,6 +64,5 @@ calc_first_yes <- function(data) {
     dplyr::group_by(individual_id, phenophase_id, year ) |>
     dplyr::arrange(day_of_year) |>
     dplyr::slice(1) |>
-    dplyr::ungroup() |>
     dplyr::rename(day_of_first_yes = day_of_year)
 }
