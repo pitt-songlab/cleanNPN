@@ -83,13 +83,12 @@
 #' @export
 calc_first_yes <- function(data) {
   data |>
-    dplyr::select(-intensity_category_id, -intensity_value, - abundance_value) |>
+    dplyr::select(observation_id, species_id, individual_id, phenophase_id, phenophase_description, observation_date, day_of_year, phenophase_status) |>
     dplyr::filter(phenophase_status == 1) |>
     dplyr::mutate(year = lubridate::year(observation_date) ) |>
     dplyr::group_by(individual_id, phenophase_id, year ) |>
     dplyr::arrange(day_of_year) |>
     dplyr::slice(1) |>
     dplyr::ungroup() |>
-    dplyr::rename(day_of_first_yes = day_of_year) |>
-    dplyr::select(-observation_date, -observation_id, -update_datetime)
+    dplyr::rename(day_of_first_yes = day_of_year)
 }
