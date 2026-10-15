@@ -1,10 +1,10 @@
 #' Resolve conflicting observations by keeping the most experienced observer
 #'
 #' Cleans phenophase observation data in which multiple observers have
-#' reported on the same individual, phenophase, and date. When observers
-#' disagree or duplicate each other, the record from the observer with the
-#' most total observations (a proxy for experience) is retained. Uncertain
-#' and missing status records are removed.
+#' reported on the same individual, phenophase, and date. Uncertain
+#' and missing status records are removed first. Among the remaining records,
+#' when observers disagree or duplicate each other, the record from the
+#' observer with the most total observations (a proxy for experience) is retained.
 #'
 #' @details
 #' The function performs the following steps:
@@ -18,6 +18,7 @@
 #'   \item For each combination of `individual_id`, `phenophase_id`, and
 #'     `observation_date`, keeps the record(s) with the highest
 #'     `num_of_observations`.
+#'    \item Drops the temporary `year` column before returning.
 #' }
 #'
 #' **Choosing how observations are counted.** The `calculate_observation_option`
@@ -41,11 +42,11 @@
 #'   \item Ties are preserved (`with_ties = TRUE`). If two observers have the
 #'     same `num_of_observations` for a given individual, phenophase, and
 #'     date, both records are kept, so the output may still contain more than
-#'     one record per date.
+#'     one record per individual, phenophase, and date.
 #'   \item Records with no conflict (only one observer for that individual,
 #'     phenophase, and date) are always retained, provided their status is
 #'     known.
-#'   \item Any existing `year` column in `data` is overwritten.
+#'   \item Any existing `year` column in `data` is overwritten and removed from the output.
 #' }
 #'
 #' @param data A data frame or tibble of phenophase observations. Must contain
@@ -69,7 +70,7 @@
 #'   observer only. Defaults to `NULL`.
 #'
 #' @return A tibble containing the filtered observations with all
-#'   original columns plus:
+#'   original columns (except `year`, which is always removed) plus:
 #'   \describe{
 #'     \item{`num_of_observations`}{Number of observations attributed to the
 #'       record's observer within the grouping defined by
