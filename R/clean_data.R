@@ -15,19 +15,21 @@
 #'     Calls [clean_by_resolving_conflict()].
 #'   \item **Leading "no" count** (requires `leading_window_days` and
 #'     `min_leading_no`): adds `leading_no_count`, the number of "no"
-#'     observations in the window preceding each observation. Calls
+#'     observations in the window preceding each observation. Uses `prioritize`
+#'     to choose between conflicting same-date records. Calls
 #'     [clean_by_leading_no()].
 #'   \item **Trailing "yes" count** (requires `trailing_window_days` and
 #'     `min_trailing_yes`): adds `trailing_yes_count`, the number of "yes"
-#'     observations in the window following each observation. Calls
+#'     observations in the window following each observation. Uses `prioritize`
+#'     to choose between conflicting same-date records. Calls
 #'     [clean_by_trailing_yes()].
 #'   \item **Threshold filtering**: keeps only rows where
 #'     `leading_no_count >= min_leading_no` and/or
 #'     `trailing_yes_count >= min_trailing_yes`, for whichever steps were
 #'     requested.
-#'   \item **Day-of-year window** (requires `min_doy` and/or `max_doy`):
-#'     restricts observations to the given day-of-year range. Calls
-#'     [clean_by_window()].
+#'   \item **Day-of-year window** (requires `min_doy` and/or `max_doy`, and a
+#'     `day_of_year` column in `data`): restricts observations to the given
+#'     day-of-year range. Calls [clean_by_window()].
 #' }
 #'
 #' **Important notes:**
@@ -44,8 +46,15 @@
 #'     `calculate_observation_option` is `NULL`.
 #'   \item The leading and trailing steps remove records with
 #'     `phenophase_status` of `-1` and keep one record per individual,
-#'     phenophase, and date. The conflict-resolution step also removes `NA`
-#'     statuses.
+#'     phenophase, and date. When records for the same individual,
+#'     phenophase, and date disagree, `prioritize` determines which is kept:
+#'     `"no"` keeps the "no" record and `"yes"` keeps the "yes" record.
+#'     `prioritize` applies to both steps and is ignored if neither runs.
+#'   \item The day-of-year window step filters on an existing `day_of_year`
+#'     column; it does not create one. If you supply `min_doy` or `max_doy`
+#'     and `data` has no `day_of_year` column, the step will fail. Add the
+#'     column beforehand, e.g.
+#'     `data$day_of_year <- as.integer(format(data$observation_date, "%j"))`.
 #'   \item If no arguments are supplied, the data are returned unchanged.
 #'   \item Progress messages are printed for each step that runs. Use
 #'     [suppressMessages()] to silence them.
@@ -56,7 +65,8 @@
 #'   `individual_id`, `phenophase_id`, `observation_date` (class `Date`), and
 #'   `phenophase_status` (`1` = yes, `0` = no, `-1` = unknown). Resolving
 #'   conflicts also requires `observedby_person_id`, plus any columns named in
-#'   `calculate_observation_by`.
+#'   `calculate_observation_by`. The day-of-year window step requires an integer
+#'   `day_of_year` column (1-366).
 #' @param calculate_observation_option A character string, one of `"by_year"`,
 #'   `"all_years"`, or `"other"`, specifying how each observer's number of
 #'   observations is counted when resolving conflicts. See
@@ -72,6 +82,11 @@
 #'   days, of the window preceding each observation in which "no" records are
 #'   counted. Must be supplied together with `min_leading_no`. Defaults to
 #'   `NULL` (step skipped).
+#' @param prioritize A character string, either `"no"` or `"yes"`, specifying
+#'   which status to keep when an individual has conflicting records for the
+#'   same phenophase and date. Passed to both [clean_by_leading_no()] and
+#'   [clean_by_trailing_yes()]. Defaults to `"no"`. Ignored unless the leading
+#'   or trailing step runs.
 #' @param min_trailing_yes A single number giving the minimum
 #'   `trailing_yes_count` a record must have to be kept. Must be supplied
 #'   together with `trailing_window_days`. Defaults to `NULL` (step skipped).
@@ -80,7 +95,8 @@
 #'   are counted. Must be supplied together with `min_trailing_yes`. Defaults
 #'   to `NULL` (step skipped).
 #' @param min_doy,max_doy Integers giving the lower and upper bounds (inclusive,
-#'   day of year, 1-366) of the observations to retain. Either may be `NULL`
+#'   day of year, 1-366) of the observations to retain, compared against the
+#'   `day_of_year` column in the `data` . Either may be `NULL`
 #'   to leave that bound open. If both are `NULL` (the default), the window
 #'   step is skipped.
 #'
@@ -104,11 +120,31 @@
 #'   phenophase_status = c(0, 0, 1, 1, 1, 1, 0)
 #' )
 #'
+#' # The day-of-year window step requires a `day_of_year` column
+#' obs$day_of_year <- as.integer(format(obs$observation_date, "%j"))
+#'
 #' # Resolve observer conflicts only
 #' clean_data(obs, calculate_observation_option = "by_year")
 #'
 #' # Keep records followed by at least 2 "yes" observations within 7 days
 #' clean_data(obs, min_trailing_yes = 2, trailing_window_days = 7)
+#'
+#' # When same-date records conflict, keep the "no" record (the default)...
+#' clean_data(
+#'   obs,
+#'   min_trailing_yes = 2, trailing_window_days = 7,
+#'   prioritize = "no"
+#' )
+#'
+#' # ...or keep the "yes" record
+#' clean_data(
+#'   obs,
+#'   min_trailing_yes = 2, trailing_window_days = 7,
+#'   prioritize = "yes"
+#' )
+#'
+#' #Restrict to a day_of_year window (uses the `day_of_year` column)
+#' clean_data(obs, min_doy = 95, max_doy = 100)
 #'
 #' # Combine several steps
 #' clean_data(
@@ -127,6 +163,7 @@ clean_data <- function(data,
                        leading_window_days = NULL,
                        min_trailing_yes = NULL,
                        trailing_window_days = NULL,
+                       prioritize = c("no", "yes"),
                        min_doy = NULL, max_doy = NULL) {
   data_clean <- data
 
@@ -142,13 +179,15 @@ clean_data <- function(data,
   if (!is.null(leading_window_days) && !is.null(min_leading_no)) {
     message("Cleaning by leading no")
     data_clean <- data_clean |>
-      clean_by_leading_no(leading_window_days = leading_window_days)
+      clean_by_leading_no(leading_window_days = leading_window_days,
+                          prioritize = prioritize)
   }
 
   if (!is.null(trailing_window_days) && !is.null(min_trailing_yes)) {
     message("Cleaning by trailing yes")
     data_clean <- data_clean |>
-      clean_by_trailing_yes(trailing_window_days = trailing_window_days)
+      clean_by_trailing_yes(trailing_window_days = trailing_window_days,
+                            prioritize = prioritize)
   }
 
   if (!is.null(leading_window_days) && !is.null(min_leading_no)) {
