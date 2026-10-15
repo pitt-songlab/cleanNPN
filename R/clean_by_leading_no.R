@@ -47,14 +47,14 @@
 #'       `-1` = unknown.}
 #'   }
 #' @param leading_window_days A single non-negative number giving the length
-#'   of the lookback window, in days. The window starts this many days before
+#'   of the look back window, in days. The window starts this many days before
 #'   each observation date and ends the day before it. Defaults to `7`.
 #' @param prioritize Either `"no"` (the default) or `"yes"`. Determines which
 #'   record is retained when an individual has more than one record for the same
 #'   phenophase on the same date: `"no"` keeps a "No" over a "Yes", and `"yes"`
 #'   keeps a "Yes" over a "No".
 #'
-#' @return An ungrouped data frame containing the rows of `data` that remain
+#' @return A data frame containing the rows of `data` that remain
 #'   after removing unknown-status records and same-day duplicates, with all
 #'   original columns plus:
 #'   \describe{
