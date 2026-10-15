@@ -12,6 +12,10 @@
 #' result, individual-phenophase-year combinations with no "yes" records do not
 #' appear in the output.
 #'
+#' The calendar year is derived from `observation_date`, while the earliest
+#' record within each group is identified using `day_of_year`. The function
+#' does not check that the two are consistent with each other
+#'
 #' If an individual has multiple "yes" records on the
 #' same day of year within a group, they share the same `day_of_first_yes`, so
 #' the result is unaffected by which one is kept.
@@ -63,5 +67,5 @@ calc_first_yes <- function(data) {
     dplyr::slice(1) |>
     dplyr::rename(day_of_first_yes = day_of_year) |>
     dplyr::ungroup () |>
-    dplyr::select(phenophase_id, individual_id, year, day_of_first_yes)
+    dplyr::select(individual_id, phenophase_id, year, day_of_first_yes)
 }
