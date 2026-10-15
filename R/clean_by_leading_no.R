@@ -4,24 +4,7 @@
 #' records were made for the same individual and phenophase during a window of
 #' days leading up to, but not including, that observation's date. Observations
 #' with unknown status are dropped, and duplicate records on the same day are
-#' reduced to a single observation.
-#'
-#' @details
-#' The function processes the data in the following steps:
-#'
-#' 1. **Remove unknown status.** Records with `phenophase_status == -1`
-#'    (unknown) are removed.
-#' 2. **Resolve same-day duplicates.** Only one record is kept for each
-#'    combination of `individual_id`, `phenophase_id`, and `observation_date`.
-#'    When a day has conflicting records, `prioritize` determines which
-#'    one is kept.
-#' 3. **Count leading "No" records.** Within each `individual_id` and
-#'    `phenophase_id` group, a new column, `leading_no_count`, is calculated.
-#'    It is the number of records with `phenophase_status == 0` that fall in
-#'    the window from `leading_window_days` days before the observation date
-#'    through the day before it (i.e., `[observation_date - leading_window_days,
-#'    observation_date - 1]`). The current observation is never included in its
-#'    own count.
+#' reduced to a single observation determined by `prioritize`.
 #'
 #' **Sorting and year boundaries.** Observations are ordered by
 #' `observation_date`, **not** by `day_of_year`. Because the window is

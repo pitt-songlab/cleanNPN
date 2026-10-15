@@ -4,7 +4,7 @@
 #' records were made for the same individual and phenophase during a window of
 #' days following, but not including, that observation's date. Observations
 #' with unknown status are dropped, and duplicate records on the same day are
-#' reduced to a single observation.
+#' reduced to a single observation determined by `prioritize`.
 #'
 #' **Sorting and year boundaries.** Observations are ordered by
 #' `observation_date`, **not** by `day_of_year`. Because the window is
