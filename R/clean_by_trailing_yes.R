@@ -6,23 +6,6 @@
 #' with unknown status are dropped, and duplicate records on the same day are
 #' reduced to a single observation.
 #'
-#' @details
-#' The function processes the data in the following steps:
-#'
-#' 1. **Remove unknown status.** Records with `phenophase_status == -1`
-#'    (unknown) are removed.
-#' 2. **Resolve same-day duplicates.** Only one record is kept for each
-#'    combination of `individual_id`, `phenophase_id`, and `observation_date`.
-#'    When a day has conflicting records, `prioritize` determines which
-#'    one is kept.
-#' 3. **Count trailing "Yes" records.** Within each `individual_id` and
-#'    `phenophase_id` group, a new column, `trailing_yes_count`, is calculated.
-#'    It is the number of records with `phenophase_status == 1` that fall in
-#'    the window from the day after the observation date through
-#'    `trailing_window_days` days after it (i.e., `[observation_date + 1,
-#'    observation_date + trailing_window_days]`). The current observation is
-#'    never included in its own count.
-#'
 #' **Sorting and year boundaries.** Observations are ordered by
 #' `observation_date`, **not** by `day_of_year`. Because the window is
 #' defined using calendar dates, the count can cross over January 1st. For
@@ -57,7 +40,7 @@
 #'   phenophase on the same date: `"yes"` keeps a "Yes" over a "No", and `"no"`
 #'   keeps a "No" over a "Yes".
 #'
-#' @return An ungrouped data frame containing the rows of `data` that remain
+#' @return A data frame containing the rows of `data` that remain
 #'   after removing unknown-status records and same-day duplicates, with all
 #'   original columns plus:
 #'   \describe{
