@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_first_yes.R
 \name{calc_first_yes}
 \alias{calc_first_yes}
-\title{Calculate the first "yes" observation for each individual, phenophase, and year}
+\title{Calculate the day of first "yes" observation}
 \usage{
 calc_first_yes(data)
 }
@@ -16,49 +16,38 @@ the following columns:
 \code{Date} (or otherwise compatible with \code{\link[lubridate:year]{lubridate::year()}}).}
 \item{day_of_year}{Numeric day of year (1-366) of the observation.}
 \item{phenophase_status}{Numeric status of the phenophase, where \code{1}
-indicates "yes" (phenophase observed).}
-}
-Any additional columns are discarded.}
+indicates "yes" (phenophase observed), \code{0} indicates "no", and \code{-1} indicates "uncertain".}
+}}
 }
 \value{
 A tibble with one row per \code{individual_id}, \code{phenophase_id}, and
-\code{year} combination, with the following columns:
-\describe{
-\item{day_of_first_yes}{Day of year of the earliest "yes" observation
-(renamed from \code{day_of_year}).}
-}
+\code{year} combination, with a new column \code{day_of_first_yes}, reporting the day of year of the earliest "yes" observation.
 }
 \description{
-For each combination of individual plant or animal, phenophase, and calendar
+For each combination of individual, phenophase, and calendar
 year, finds the day of year of the earliest observation in which the
 phenophase was recorded as present (a "yes"). This is commonly used to
 estimate the onset date of a phenophase such as first leaf, first flower,
 or first fruit.
 }
 \details{
-Only records with \code{phenophase_status == 1} are considered. Records with
-other values (e.g., \code{0} for "no" or \code{-1} for "uncertain") and records with
+\strong{Important notes:}
+\itemize{
+\item Because the first "yes" is chosen based on day of year within a calendar
+year, it does not account for phenophases that span the turn of the year.
+\item Only "yes" records of phenophase are considered. Records that are "no" or "uncertain" and records with
 missing status are dropped before the first observation is selected. As a
 result, individual-phenophase-year combinations with no "yes" records do not
 appear in the output.
-
-\strong{Important notes:}
-\itemize{
-\item Because the first "yes" is chosen by \code{day_of_year} within a calendar
-year, it does not account for phenophases that span the turn of the year.
+\item The result is unaffected by having multiple "yes" records from different observers
+for the same individual on the same day.
 }
-
-If an individual has multiple "yes" records on the
-same day of year within a group, they share the same \code{day_of_first_yes}, so
-the result is unaffected by which one is kept.
 }
 \examples{
 obs <- data.frame(
   observation_id = 1:5,
-  species_id = 3,
   individual_id = c(101, 101, 101, 101, 102),
   phenophase_id = 373,
-  phenophase_description = "Leaves",
   observation_date = as.Date(c(
     "2023-04-10", "2023-04-03", "2023-04-17", "2024-03-28", "2023-04-12"
   )),
