@@ -18,7 +18,7 @@ columns:
 }}
 
 \item{leading_window_days}{A single non-negative number giving the length
-of the lookback window, in days. The window starts this many days before
+of the look back window, in days. The window starts this many days before
 each observation date and ends the day before it. Defaults to \code{7}.}
 
 \item{prioritize}{Either \code{"no"} (the default) or \code{"yes"}. Determines which
@@ -27,7 +27,7 @@ phenophase on the same date: \code{"no"} keeps a "No" over a "Yes", and \code{"y
 keeps a "Yes" over a "No".}
 }
 \value{
-An ungrouped data frame containing the rows of \code{data} that remain
+A data frame containing the rows of \code{data} that remain
 after removing unknown-status records and same-day duplicates, with all
 original columns plus:
 \describe{
@@ -43,25 +43,9 @@ For each observation, counts how many "No" (\code{phenophase_status == 0})
 records were made for the same individual and phenophase during a window of
 days leading up to, but not including, that observation's date. Observations
 with unknown status are dropped, and duplicate records on the same day are
-reduced to a single observation.
+reduced to a single observation determined by \code{prioritize}.
 }
 \details{
-The function processes the data in the following steps:
-\enumerate{
-\item \strong{Remove unknown status.} Records with \code{phenophase_status == -1}
-(unknown) are removed.
-\item \strong{Resolve same-day duplicates.} Only one record is kept for each
-combination of \code{individual_id}, \code{phenophase_id}, and \code{observation_date}.
-When a day has conflicting records, \code{prioritize} determines which
-one is kept.
-\item \strong{Count leading "No" records.} Within each \code{individual_id} and
-\code{phenophase_id} group, a new column, \code{leading_no_count}, is calculated.
-It is the number of records with \code{phenophase_status == 0} that fall in
-the window from \code{leading_window_days} days before the observation date
-through the day before it (i.e., \verb{[observation_date - leading_window_days, observation_date - 1]}). The current observation is never included in its
-own count.
-}
-
 \strong{Sorting and year boundaries.} Observations are ordered by
 \code{observation_date}, \strong{not} by \code{day_of_year}. Because the window is
 defined using calendar dates, the count can cross over January 1st. For

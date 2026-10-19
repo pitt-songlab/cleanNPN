@@ -42,6 +42,12 @@ missing status are dropped before the first observation is selected. As a
 result, individual-phenophase-year combinations with no "yes" records do not
 appear in the output.
 
+\strong{Important notes:}
+\itemize{
+\item Because the first "yes" is chosen by \code{day_of_year} within a calendar
+year, it does not account for phenophases that span the turn of the year.
+}
+
 If an individual has multiple "yes" records on the
 same day of year within a group, they share the same \code{day_of_first_yes}, so
 the result is unaffected by which one is kept.

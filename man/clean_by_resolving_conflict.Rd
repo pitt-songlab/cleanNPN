@@ -35,7 +35,7 @@ observer only. Defaults to \code{NULL}.}
 }
 \value{
 A tibble containing the filtered observations with all
-original columns plus:
+original columns (except \code{year}, which is always removed) plus:
 \describe{
 \item{\code{num_of_observations}}{Number of observations attributed to the
 record's observer within the grouping defined by
@@ -44,10 +44,10 @@ record's observer within the grouping defined by
 }
 \description{
 Cleans phenophase observation data in which multiple observers have
-reported on the same individual, phenophase, and date. When observers
-disagree or duplicate each other, the record from the observer with the
-most total observations (a proxy for experience) is retained. Uncertain
-and missing status records are removed.
+reported on the same individual, phenophase, and date. Uncertain
+and missing status records are removed first. Among the remaining records,
+when observers disagree or duplicate each other, the record from the
+observer with the most total observations (a proxy for experience) is retained.
 }
 \details{
 The function performs the following steps:
@@ -61,6 +61,7 @@ or \code{NA}.
 \item For each combination of \code{individual_id}, \code{phenophase_id}, and
 \code{observation_date}, keeps the record(s) with the highest
 \code{num_of_observations}.
+\item Drops the temporary \code{year} column before returning.
 }
 
 \strong{Choosing how observations are counted.} The \code{calculate_observation_option}
@@ -84,11 +85,11 @@ are removed, so those records contribute to an observer's total.
 \item Ties are preserved (\code{with_ties = TRUE}). If two observers have the
 same \code{num_of_observations} for a given individual, phenophase, and
 date, both records are kept, so the output may still contain more than
-one record per date.
+one record per individual, phenophase, and date.
 \item Records with no conflict (only one observer for that individual,
 phenophase, and date) are always retained, provided their status is
 known.
-\item Any existing \code{year} column in \code{data} is overwritten.
+\item Any existing \code{year} column in \code{data} is overwritten and removed from the output.
 }
 }
 \examples{

@@ -3,6 +3,7 @@
 export(calc_first_yes)
 export(clean_by_leading_no)
 export(clean_by_resolving_conflict)
+export(clean_by_trailing_yes)
 export(clean_by_window)
 export(clean_data)
 export(download_test_data)

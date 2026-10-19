@@ -12,6 +12,7 @@ clean_data(
   leading_window_days = NULL,
   min_trailing_yes = NULL,
   trailing_window_days = NULL,
+  prioritize = c("no", "yes"),
   min_doy = NULL,
   max_doy = NULL
 )
@@ -22,7 +23,8 @@ contain the columns required by each step you request, including
 \code{individual_id}, \code{phenophase_id}, \code{observation_date} (class \code{Date}), and
 \code{phenophase_status} (\code{1} = yes, \code{0} = no, \code{-1} = unknown). Resolving
 conflicts also requires \code{observedby_person_id}, plus any columns named in
-\code{calculate_observation_by}.}
+\code{calculate_observation_by}. The day-of-year window step requires an integer
+\code{day_of_year} column (1-366).}
 
 \item{calculate_observation_option}{A character string, one of \code{"by_year"},
 \code{"all_years"}, or \code{"other"}, specifying how each observer's number of
@@ -52,8 +54,15 @@ days, of the window following each observation in which "yes" records
 are counted. Must be supplied together with \code{min_trailing_yes}. Defaults
 to \code{NULL} (step skipped).}
 
+\item{prioritize}{A character string, either \code{"no"} or \code{"yes"}, specifying
+which status to keep when an individual has conflicting records for the
+same phenophase and date. Passed to both \code{\link[=clean_by_leading_no]{clean_by_leading_no()}} and
+\code{\link[=clean_by_trailing_yes]{clean_by_trailing_yes()}}. Defaults to \code{"no"}. Ignored unless the leading
+or trailing step runs.}
+
 \item{min_doy, max_doy}{Integers giving the lower and upper bounds (inclusive,
-day of year, 1-366) of the observations to retain. Either may be \code{NULL}
+day of year, 1-366) of the observations to retain, compared against the
+\code{day_of_year} column in the \code{data} . Either may be \code{NULL}
 to leave that bound open. If both are \code{NULL} (the default), the window
 step is skipped.}
 }
@@ -82,19 +91,21 @@ date, keeps the record(s) from the observer with the most observations.
 Calls \code{\link[=clean_by_resolving_conflict]{clean_by_resolving_conflict()}}.
 \item \strong{Leading "no" count} (requires \code{leading_window_days} and
 \code{min_leading_no}): adds \code{leading_no_count}, the number of "no"
-observations in the window preceding each observation. Calls
+observations in the window preceding each observation. Uses \code{prioritize}
+to choose between conflicting same-date records. Calls
 \code{\link[=clean_by_leading_no]{clean_by_leading_no()}}.
 \item \strong{Trailing "yes" count} (requires \code{trailing_window_days} and
 \code{min_trailing_yes}): adds \code{trailing_yes_count}, the number of "yes"
-observations in the window following each observation. Calls
+observations in the window following each observation. Uses \code{prioritize}
+to choose between conflicting same-date records. Calls
 \code{\link[=clean_by_trailing_yes]{clean_by_trailing_yes()}}.
 \item \strong{Threshold filtering}: keeps only rows where
 \code{leading_no_count >= min_leading_no} and/or
 \code{trailing_yes_count >= min_trailing_yes}, for whichever steps were
 requested.
-\item \strong{Day-of-year window} (requires \code{min_doy} and/or \code{max_doy}):
-restricts observations to the given day-of-year range. Calls
-\code{\link[=clean_by_window]{clean_by_window()}}.
+\item \strong{Day-of-year window} (requires \code{min_doy} and/or \code{max_doy}, and a
+\code{day_of_year} column in \code{data}): restricts observations to the given
+day-of-year range. Calls \code{\link[=clean_by_window]{clean_by_window()}}.
 }
 
 \strong{Important notes:}
@@ -111,8 +122,15 @@ arguments. If only one is supplied (e.g., \code{min_trailing_yes} without
 \code{calculate_observation_option} is \code{NULL}.
 \item The leading and trailing steps remove records with
 \code{phenophase_status} of \code{-1} and keep one record per individual,
-phenophase, and date. The conflict-resolution step also removes \code{NA}
-statuses.
+phenophase, and date. When records for the same individual,
+phenophase, and date disagree, \code{prioritize} determines which is kept:
+\code{"no"} keeps the "no" record and \code{"yes"} keeps the "yes" record.
+\code{prioritize} applies to both steps and is ignored if neither runs.
+\item The day-of-year window step filters on an existing \code{day_of_year}
+column; it does not create one. If you supply \code{min_doy} or \code{max_doy}
+and \code{data} has no \code{day_of_year} column, the step will fail. Add the
+column beforehand, e.g.
+\code{data$day_of_year <- as.integer(format(data$observation_date, "\%j"))}.
 \item If no arguments are supplied, the data are returned unchanged.
 \item Progress messages are printed for each step that runs. Use
 \code{\link[=suppressMessages]{suppressMessages()}} to silence them.
@@ -127,11 +145,31 @@ obs <- data.frame(
   phenophase_status = c(0, 0, 1, 1, 1, 1, 0)
 )
 
+# The day-of-year window step requires a `day_of_year` column
+obs$day_of_year <- as.integer(format(obs$observation_date, "\%j"))
+
 # Resolve observer conflicts only
 clean_data(obs, calculate_observation_option = "by_year")
 
 # Keep records followed by at least 2 "yes" observations within 7 days
 clean_data(obs, min_trailing_yes = 2, trailing_window_days = 7)
+
+# When same-date records conflict, keep the "no" record (the default)...
+clean_data(
+  obs,
+  min_trailing_yes = 2, trailing_window_days = 7,
+  prioritize = "no"
+)
+
+# ...or keep the "yes" record
+clean_data(
+  obs,
+  min_trailing_yes = 2, trailing_window_days = 7,
+  prioritize = "yes"
+)
+
+#Restrict to a day_of_year window (uses the `day_of_year` column)
+clean_data(obs, min_doy = 95, max_doy = 100)
 
 # Combine several steps
 clean_data(
