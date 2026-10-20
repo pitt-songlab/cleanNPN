@@ -25,8 +25,9 @@
 #'   \describe{
 #'     \item{`individual_id`}{Identifier for the individual plant or animal.}
 #'     \item{`phenophase_id`}{Identifier for the phenophase.}
-#'     \item{`observation_date`}{Date of the observation (class `Date`).}
-#'     \item{`phenophase_status`}{Integer status: `1` = yes, `0` = no,
+#'     \item{`observation_date`}{Date of the observation. Must be of class
+#'       `Date` .}
+#'     \item{`phenophase_status`}{Integer status of the phenophase: `1` = yes, `0` = no,
 #'       `-1` = unknown.}
 #'   }
 #' @param leading_window_days A single non-negative number giving the length

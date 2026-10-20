@@ -37,7 +37,7 @@ or first fruit.
 year, it does not account for phenophases that span the turn of the year.
 \item Only "yes" records of phenophase are considered. Records that are "no" or "uncertain" and records with
 missing status are dropped before the first observation is selected. As a
-result, individual-phenophase-year combinations with no "yes" records do not
+result, individual-phenophase-year combinations without "yes" records do not
 appear in the output.
 \item The result is unaffected by having multiple "yes" records from different observers
 for the same individual on the same day.
