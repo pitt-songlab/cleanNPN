@@ -1,9 +1,9 @@
 #' Count "No" observations in a leading window before each observation
 #'
-#' For each observation, counts how many "No" (`phenophase_status == 0`)
+#' For each observation, counts how many "No"
 #' records were made for the same individual and phenophase during a window of
 #' days leading up to, but not including, that observation's date. Observations
-#' with unknown status are dropped, and duplicate records on the same day are
+#' with "Uncertain" status are dropped, and duplicate records on the same day are
 #' reduced to a single observation determined by `prioritize`.
 #'
 #' **Sorting and year boundaries.** Observations are ordered by
@@ -28,9 +28,9 @@
 #'     \item{`observation_date`}{Date of the observation. Must be of class
 #'       `Date` .}
 #'     \item{`phenophase_status`}{Integer status of the phenophase: `1` = yes, `0` = no,
-#'       `-1` = unknown.}
+#'       `-1` = uncertain.}
 #'   }
-#' @param leading_window_days A single non-negative number giving the length
+#' @param leading_window_days A single positive integer giving the length
 #'   of the look back window, in days. The window starts this many days before
 #'   each observation date and ends the day before it. Defaults to `7`.
 #' @param prioritize Either `"no"` (the default) or `"yes"`. Determines which
@@ -46,8 +46,6 @@
 #'       `individual_id` and `phenophase_id` within the leading window before
 #'       each observation date (excluding the date itself).}
 #'   }
-#'   Rows are sorted by `individual_id`, `phenophase_id`, and then
-#'   `observation_date`.
 #'
 #' @examples
 #' obs <- data.frame(
