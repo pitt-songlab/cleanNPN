@@ -14,9 +14,8 @@
 #'
 #' **Important notes:**
 #' \itemize{
-#'   \item Records with `NA` in `day_of_year` are always removed, because
-#'     comparisons with `NA` are not `TRUE` and [dplyr::filter()] drops
-#'     those rows. This happens even when both bounds are `NULL`.
+#'   \item Records with `NA` in `day_of_year` are always removed.
+#'     This happens even when both bounds are `NULL`.
 #'   \item The window is a simple range on a single calendar year's day
 #'     numbering, so it cannot represent a window that wraps around the
 #'     turn of the year (e.g., day 330 to day 30). If `min_doy > max_doy`,
@@ -27,18 +26,19 @@
 #'     one day between years.
 #' }
 #'
-#' @param data A data frame or tibble of phenophase observations. Must contain
-#'   a numeric `day_of_year` column.
+#' @param data A data frame or tibble of phenophase observations. Must contain the
+#'   column:
+#'   \describe{
+#'     \item{`day_of_year`}{Numeric day of year for the observation.}
+#'   }
 #' @param min_doy A single number giving the earliest day of year (inclusive)
 #'   to keep. If `NULL` (the default), there is no lower limit.
 #' @param max_doy A single number giving the latest day of year (inclusive)
 #'   to keep. If `NULL` (the default), there is no upper limit.
 #'
-#' @return A data frame or tibble of the same class as `data`, containing
-#'   only the rows with `day_of_year` between `min_doy` and `max_doy`. All
-#'   columns are unchanged.
-#'
-#' @seealso [clean_data()], which calls this function as its final step.
+#' @return A tibble containing the filtered observations with all original
+#'   columns and only the rows with `day_of_year` between `min_doy` and
+#'   `max_doy`.
 #'
 #' @examples
 #' obs <- data.frame(
@@ -80,6 +80,7 @@ clean_by_window <- function(data, min_doy = NULL, max_doy = NULL) {
     max_doy <- Inf
   }
   data_clean <- data |>
+    dplyr::as_tibble() |>
     dplyr::filter(
       day_of_year >= min_doy,
       day_of_year <= max_doy

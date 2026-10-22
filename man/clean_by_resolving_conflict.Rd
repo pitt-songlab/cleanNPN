@@ -16,26 +16,28 @@ the following columns, plus any columns named in
 \code{calculate_observation_by}:
 \describe{
 \item{\code{individual_id}}{Identifier for the individual plant or animal.}
-\item{\code{phenophase_id}}{Identifier for the phenophase being observed.}
-\item{\code{observation_date}}{Date of the observation, of class \code{Date}.}
+\item{\code{phenophase_id}}{Identifier for the phenophase.}
+\item{\code{observation_date}}{Date of the observation. Must be of class
+\code{Date}.}
 \item{\code{observedby_person_id}}{Identifier for the observer.}
 \item{\code{phenophase_status}}{Integer status: \code{1} = yes, \code{0} = no,
-\code{-1} = unknown (removed).}
+\code{-1} = uncertain.}
 }}
 
 \item{calculate_observation_option}{A character string specifying how each
 observer's number of observations is calculated. One of \code{"by_year"}
-(the default), \code{"all_years"}, or \code{"other"}. See Details.}
+(the default), \code{"all_years"}, or \code{"other"}. If \code{"other"},
+\code{calculate_observation_by} must also be supplied. See Details.}
 
 \item{calculate_observation_by}{A character vector of column name(s) in
 \code{data} used to group observations when
-\code{calculate_observation_option = "other"}. Ignored for the other options.
-If \code{NULL} (the default) with \code{"other"}, observations are counted per
-observer only. Defaults to \code{NULL}.}
+\code{calculate_observation_option = "other"}. Required for \code{"other"}; an
+error is thrown if it is \code{NULL}. Ignored for the other options.
+Defaults to \code{NULL}.}
 }
 \value{
-A tibble containing the filtered observations with all
-original columns (except \code{year}, which is always removed) plus:
+A tibble containing the filtered observations with all original
+columns and a new column:
 \describe{
 \item{\code{num_of_observations}}{Number of observations attributed to the
 record's observer within the grouping defined by
@@ -44,24 +46,20 @@ record's observer within the grouping defined by
 }
 \description{
 Cleans phenophase observation data in which multiple observers have
-reported on the same individual, phenophase, and date. Uncertain
-and missing status records are removed first. Among the remaining records,
-when observers disagree or duplicate each other, the record from the
-observer with the most total observations (a proxy for experience) is retained.
+reported on the same individual, phenophase, and date. When observers
+disagree or duplicate each other, the record from the observer with the
+most total observations (a proxy for experience) is retained. Uncertain
+and missing status records are removed.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-\item Derives a \code{year} column from \code{observation_date}.
-\item Counts the number of observations made by each observer, within
-groups determined by \code{calculate_observation_option}, and stores the
-result in \code{num_of_observations}.
-\item Removes records where \code{phenophase_status} is \code{-1} (unknown/uncertain)
-or \code{NA}.
-\item For each combination of \code{individual_id}, \code{phenophase_id}, and
-\code{observation_date}, keeps the record(s) with the highest
-\code{num_of_observations}.
-\item Drops the temporary \code{year} column before returning.
+\item Counts how many observations each observer has made, using the
+grouping set by \code{calculate_observation_option}.
+\item Removes observations with an uncertain or missing status.
+\item When multiple observers recorded the same individual, phenophase,
+and date, keeps the record from the observer with the most
+observations.
 }
 
 \strong{Choosing how observations are counted.} The \code{calculate_observation_option}
@@ -74,8 +72,9 @@ tallied:
 (\code{observedby_person_id} only).}
 \item{\code{"other"}}{Counts per observer within the additional grouping
 column(s) given in \code{calculate_observation_by} (e.g., a site column).
-\code{observedby_person_id} is always included automatically. The derived
-\code{year} column may be used here.}
+\code{calculate_observation_by} is required for this option; an error is
+thrown if it is \code{NULL}. \code{observedby_person_id} is always included
+automatically. The derived \code{year} column may be used here.}
 }
 
 \strong{Important notes:}
@@ -85,11 +84,10 @@ are removed, so those records contribute to an observer's total.
 \item Ties are preserved (\code{with_ties = TRUE}). If two observers have the
 same \code{num_of_observations} for a given individual, phenophase, and
 date, both records are kept, so the output may still contain more than
-one record per individual, phenophase, and date.
+one record per date.
 \item Records with no conflict (only one observer for that individual,
 phenophase, and date) are always retained, provided their status is
 known.
-\item Any existing \code{year} column in \code{data} is overwritten and removed from the output.
 }
 }
 \examples{
@@ -116,5 +114,8 @@ clean_by_resolving_conflict(
   calculate_observation_option = "other",
   calculate_observation_by = "site_id"
 )
+
+# "other" requires calculate_observation_by, so this raises an error
+try(clean_by_resolving_conflict(obs, calculate_observation_option = "other"))
 
 }

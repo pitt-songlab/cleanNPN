@@ -21,7 +21,7 @@ clean_data(
 \item{data}{A data frame or tibble of phenophase observations. It must
 contain the columns required by each step you request, including
 \code{individual_id}, \code{phenophase_id}, \code{observation_date} (class \code{Date}), and
-\code{phenophase_status} (\code{1} = yes, \code{0} = no, \code{-1} = unknown). Resolving
+\code{phenophase_status} (\code{1} = yes, \code{0} = no, \code{-1} = uncertain). Resolving
 conflicts also requires \code{observedby_person_id}, plus any columns named in
 \code{calculate_observation_by}. The day-of-year window step requires an integer
 \code{day_of_year} column (1-366).}
@@ -180,8 +180,4 @@ clean_data(
   min_doy = 60, max_doy = 200
 )
 
-}
-\seealso{
-\code{\link[=clean_by_resolving_conflict]{clean_by_resolving_conflict()}}, \code{\link[=clean_by_leading_no]{clean_by_leading_no()}},
-\code{\link[=clean_by_trailing_yes]{clean_by_trailing_yes()}}, \code{\link[=clean_by_window]{clean_by_window()}}
 }

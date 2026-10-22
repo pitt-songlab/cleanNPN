@@ -63,7 +63,7 @@
 #' @param data A data frame or tibble of phenophase observations. It must
 #'   contain the columns required by each step you request, including
 #'   `individual_id`, `phenophase_id`, `observation_date` (class `Date`), and
-#'   `phenophase_status` (`1` = yes, `0` = no, `-1` = unknown). Resolving
+#'   `phenophase_status` (`1` = yes, `0` = no, `-1` = uncertain). Resolving
 #'   conflicts also requires `observedby_person_id`, plus any columns named in
 #'   `calculate_observation_by`. The day-of-year window step requires an integer
 #'   `day_of_year` column (1-366).
@@ -107,9 +107,6 @@
 #'     \item{`leading_no_count`}{Added when the leading "no" step runs.}
 #'     \item{`trailing_yes_count`}{Added when the trailing "yes" step runs.}
 #'   }
-#'
-#' @seealso [clean_by_resolving_conflict()], [clean_by_leading_no()],
-#'   [clean_by_trailing_yes()], [clean_by_window()]
 #'
 #' @examples
 #' obs <- data.frame(

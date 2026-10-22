@@ -28,7 +28,7 @@
 #'     \item{`phenophase_id`}{Identifier for the phenophase.}
 #'     \item{`observation_date`}{Date of the observation (class `Date`).}
 #'     \item{`phenophase_status`}{Integer status: `1` = yes, `0` = no,
-#'       `-1` = unknown.}
+#'       `-1` = uncertain.}
 #'   }
 #' @param trailing_window_days A single non-negative number giving the length
 #'   of the forward-looking window, in days. The window starts the day after
@@ -36,7 +36,7 @@
 #' @param include_conflict Logical, whether to include conflicting "Yes" records
 #'   when counting trailing "Yes"s. Defaults to `TRUE`.
 #'
-#' @return A data frame containing all original rows of `data` with a new column
+#' @return A tibble containing all original rows of `data` with a new column
 #'   \describe{
 #'     \item{`trailing_yes_count`}{The number of "Yes" records for the same
 #'       `individual_id` and `phenophase_id` within the trailing window after
@@ -59,10 +59,10 @@
 #' # Exclude conflicting "Yes" records
 #' clean_by_trailing_yes(obs, trailing_window_days = 7, include_conflict = FALSE)
 #'
-#' @seealso [clean_by_leading_no()], [slider::slide_index_sum()]
 #' @export
 clean_by_trailing_yes <- function(data, trailing_window_days = 7, include_conflict = TRUE) {
   data_clean <- data |>
+    dplyr::as_tibble() |>
     dplyr::group_by(individual_id, phenophase_id, observation_date) |>
     dplyr::mutate(is_conflict = any(phenophase_status == 0) & any(phenophase_status == 1)) |>
     dplyr::ungroup() |>

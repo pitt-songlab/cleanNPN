@@ -33,7 +33,7 @@
 #' @param include_conflict Logical, whether to include conflicting "No" records
 #'   when counting leading "No"s. Defaults to `TRUE`.
 #'
-#' @return A data frame containing all original rows of `data` with a new column
+#' @return A tibble containing all original rows of `data` with a new column
 #'   \describe{
 #'     \item{`leading_no_count`}{The number of "No" records for the same
 #'       `individual_id` and `phenophase_id` within the leading window before
@@ -56,11 +56,11 @@
 #' # Exclude conflicting "No" records
 #' clean_by_leading_no(obs, leading_window_days = 7, include_conflict = FALSE)
 #'
-#' @seealso [slider::slide_index_sum()]
 #' @export
 clean_by_leading_no <- function(data, leading_window_days = 7, include_conflict = TRUE) {
-  
+
   data_clean <- data |>
+    dplyr::as_tibble() |>
     dplyr::group_by(individual_id, phenophase_id, observation_date) |>
     dplyr::mutate(is_conflict = any(phenophase_status == 0) & any(phenophase_status == 1)) |>
     dplyr::ungroup() |>

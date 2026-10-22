@@ -70,6 +70,3 @@ cleaned <- clean_data(
 }
 
 }
-\seealso{
-\code{\link[rnpn:npn_download_status_data]{rnpn::npn_download_status_data()}}, \code{\link[=clean_data]{clean_data()}}
-}

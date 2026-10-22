@@ -44,8 +44,6 @@
 #'   `phenophase_status`) plus `observedby_person_id`, `site_name`, and
 #'   `dataset_id`.
 #'
-#' @seealso [rnpn::npn_download_status_data()], [clean_data()]
-#'
 #' @examples
 #' \dontrun{
 #' # Requires an internet connection

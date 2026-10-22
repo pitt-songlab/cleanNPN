@@ -27,7 +27,7 @@
 #'       `Date` (or otherwise compatible with [lubridate::year()]).}
 #'     \item{day_of_year}{Numeric day of year (1-366) of the observation.}
 #'     \item{phenophase_status}{Integer status of the phenophase: `1` = yes, `0` = no,
-#'       `-1` = unknown.}
+#'       `-1` = uncertain.}
 #'   }
 #'
 #' @return A tibble with one row per `individual_id`, `phenophase_id`, and

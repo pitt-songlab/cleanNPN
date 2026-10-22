@@ -7,8 +7,11 @@
 clean_by_window(data, min_doy = NULL, max_doy = NULL)
 }
 \arguments{
-\item{data}{A data frame or tibble of phenophase observations. Must contain
-a numeric \code{day_of_year} column.}
+\item{data}{A data frame or tibble of phenophase observations. Must contain the
+column:
+\describe{
+\item{\code{day_of_year}}{Numeric day of year for the observation.}
+}}
 
 \item{min_doy}{A single number giving the earliest day of year (inclusive)
 to keep. If \code{NULL} (the default), there is no lower limit.}
@@ -17,9 +20,9 @@ to keep. If \code{NULL} (the default), there is no lower limit.}
 to keep. If \code{NULL} (the default), there is no upper limit.}
 }
 \value{
-A data frame or tibble of the same class as \code{data}, containing
-only the rows with \code{day_of_year} between \code{min_doy} and \code{max_doy}. All
-columns are unchanged.
+A tibble containing the filtered observations with all original
+columns and only the rows with \code{day_of_year} between \code{min_doy} and
+\code{max_doy}.
 }
 \description{
 Keeps only the observations whose \code{day_of_year} falls within a specified
@@ -36,9 +39,8 @@ limit is applied. If both are \code{NULL}, all records with a non-missing
 
 \strong{Important notes:}
 \itemize{
-\item Records with \code{NA} in \code{day_of_year} are always removed, because
-comparisons with \code{NA} are not \code{TRUE} and \code{\link[dplyr:filter]{dplyr::filter()}} drops
-those rows. This happens even when both bounds are \code{NULL}.
+\item Records with \code{NA} in \code{day_of_year} are always removed.
+This happens even when both bounds are \code{NULL}.
 \item The window is a simple range on a single calendar year's day
 numbering, so it cannot represent a window that wraps around the
 turn of the year (e.g., day 330 to day 30). If \code{min_doy > max_doy},
@@ -80,7 +82,4 @@ clean_by_window(obs_na, min_doy = 60, max_doy = 200)
 # NA rows are removed even when both bounds are NULL
 clean_by_window(obs_na)
 
-}
-\seealso{
-\code{\link[=clean_data]{clean_data()}}, which calls this function as its final step.
 }

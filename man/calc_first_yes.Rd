@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_first_yes.R
 \name{calc_first_yes}
 \alias{calc_first_yes}
-\title{Calculate the day of first "yes" observation}
+\title{Calculate the day of first "Yes" observation}
 \usage{
 calc_first_yes(data)
 }
@@ -10,34 +10,38 @@ calc_first_yes(data)
 \item{data}{A data frame or tibble of phenology observations. Must contain
 the following columns:
 \describe{
-\item{individual_id}{Identifier for the individual organism.}
+\item{individual_id}{Identifier for the individual plant or animal.}
 \item{phenophase_id}{Identifier for the phenophase.}
 \item{observation_date}{Date of the observation. Must be of class
 \code{Date} (or otherwise compatible with \code{\link[lubridate:year]{lubridate::year()}}).}
 \item{day_of_year}{Numeric day of year (1-366) of the observation.}
-\item{phenophase_status}{Numeric status of the phenophase, where \code{1}
-indicates "yes" (phenophase observed), \code{0} indicates "no", and \code{-1} indicates "uncertain".}
+\item{phenophase_status}{Integer status of the phenophase: \code{1} = yes, \code{0} = no,
+\code{-1} = uncertain.}
 }}
 }
 \value{
 A tibble with one row per \code{individual_id}, \code{phenophase_id}, and
-\code{year} combination, with a new column \code{day_of_first_yes}, reporting the day of year of the earliest "yes" observation.
+\code{year} combination, with a new column
+\describe{
+\item{\code{day_of_first_yes}}{The day of year of the earliest "Yes" observation for the same
+\code{individual_id} and \code{phenophase_id} within the calendar year.}
+}
 }
 \description{
 For each combination of individual, phenophase, and calendar
 year, finds the day of year of the earliest observation in which the
-phenophase was recorded as present (a "yes"). This is commonly used to
+phenophase was recorded as present (a "Yes"). This is commonly used to
 estimate the onset date of a phenophase such as first leaf, first flower,
 or first fruit.
 }
 \details{
-\strong{Important notes:}
+\strong{Notes:}
 \itemize{
-\item Because the first "yes" is chosen based on day of year within a calendar
+\item Because the first "Yes" is chosen based on day of year within a calendar
 year, it does not account for phenophases that span the turn of the year.
-\item Only "yes" records of phenophase are considered. Records that are "no" or "uncertain" and records with
+\item Only "Yes" records of phenophase are considered. Records that are "No" or "uncertain" and records with
 missing status are dropped before the first observation is selected. As a
-result, individual-phenophase-year combinations without "yes" records do not
+result, individual-phenophase-year combinations without "Yes" records do not
 appear in the output.
 \item The result is unaffected by having multiple "yes" records from different observers
 for the same individual on the same day.
