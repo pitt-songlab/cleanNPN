@@ -2,23 +2,20 @@
 #'
 #' For each observation, counts how many "No"
 #' records were made for the same individual and phenophase during a window of
-#' days leading up to, but not including, that observation's date. Observations
-#' with "Uncertain" status are dropped, and duplicate records on the same day are
-#' reduced to a single observation determined by `prioritize`.
+#' days leading up to, but not including, that observation's date. 
+#' Conflicting records for the same phenophase on the same date (with both "yes" and "no") are
+#' either included or excluded, controlled by `include_conflict`.
 #'
 #' **Sorting and year boundaries.** Observations are ordered by
 #' `observation_date`, **not** by `day_of_year`. Because the window is
 #' defined using calendar dates, the count can cross over January 1st. For
 #' example, with `leading_window_days = 7`, an observation on January 3 will
 #' count "No" records from the previous December, and so on across any
-#' year boundary. Ordering by `day_of_year` would incorrectly treat late-year
-#' observations as occurring after early-year ones, so it is deliberately
-#' avoided.
+#' year boundary.
 #'
 #' **Note:** `leading_no_count` counts the number of "No" *records* in the
 #' window, not the number of consecutive "No" days. Days without any
-#' observation do not contribute to the count, so gaps in monitoring lower the
-#' count rather than interrupting it.
+#' observation do not contribute to the count.
 #'
 #' @param data A data frame of phenology observations. Must contain the
 #'   columns:
@@ -33,14 +30,10 @@
 #' @param leading_window_days A single positive integer giving the length
 #'   of the look back window, in days. The window starts this many days before
 #'   each observation date and ends the day before it. Defaults to `7`.
-#' @param prioritize Either `"no"` (the default) or `"yes"`. Determines which
-#'   record is retained when an individual has more than one record for the same
-#'   phenophase on the same date: `"no"` keeps a "No" over a "Yes", and `"yes"`
-#'   keeps a "Yes" over a "No".
+#' @param include_conflict Logical, whether to include conflicting "No" records
+#'   when counting leading "No"s. Defaults to `TRUE`.
 #'
-#' @return A data frame containing the rows of `data` that remain
-#'   after removing unknown-status records and same-day duplicates, with all
-#'   original columns plus:
+#' @return A data frame containing all original rows of `data` with a new column
 #'   \describe{
 #'     \item{`leading_no_count`}{The number of "No" records for the same
 #'       `individual_id` and `phenophase_id` within the leading window before
@@ -58,36 +51,25 @@
 #'
 #' # The Jan 3 duplicate is resolved in favor of "No"; counts for early
 #' # January include "No" records from December of the prior year.
-#' clean_by_leading_no(obs, leading_window_days = 7, prioritize = "no")
+#' clean_by_leading_no(obs, leading_window_days = 7, include_conflict = TRUE)
 #'
-#' # Prefer "Yes" when same-day records conflict
-#' clean_by_leading_no(obs, leading_window_days = 7, prioritize = "yes")
+#' # Exclude conflicting "No" records
+#' clean_by_leading_no(obs, leading_window_days = 7, include_conflict = FALSE)
 #'
 #' @seealso [slider::slide_index_sum()]
 #' @export
-clean_by_leading_no <- function(data, leading_window_days = 7, prioritize = c("no", "yes")) {
-  prioritize <- match.arg(prioritize)
+clean_by_leading_no <- function(data, leading_window_days = 7, include_conflict = TRUE) {
+  
   data_clean <- data |>
-    dplyr::filter(phenophase_status != -1)
-
-  if (prioritize == "no") {
-    data_clean <- data_clean |>
-      # keep one obs per day, no over yes
-      dplyr::arrange(individual_id, phenophase_id, observation_date, phenophase_status)
-  } else if (prioritize == "yes") {
-    data_clean <- data_clean |>
-      # keep one obs per day, yes over no
-      dplyr::arrange(individual_id, phenophase_id, observation_date, dplyr::desc(phenophase_status))
-  }
-
-  data_clean <- data_clean |>
-    dplyr::distinct(individual_id, phenophase_id, observation_date, .keep_all = TRUE) |>
+    dplyr::group_by(individual_id, phenophase_id, observation_date) |>
+    dplyr::mutate(is_conflict = any(phenophase_status == 0) & any(phenophase_status == 1)) |>
+    dplyr::ungroup() |>
     dplyr::group_by(individual_id, phenophase_id) |>
     dplyr::arrange(observation_date, .by_group = TRUE) |>
     # Look backward from the window limit up to yesterday (.i = obsdate - 1)
     dplyr::mutate(
       leading_no_count = slider::slide_index_sum(
-        x = (phenophase_status == 0),
+        x = (phenophase_status == 0 & (!is_conflict | include_conflict)), # Count "No" records, optionally including conflicts
         i = observation_date,
         before = lubridate::days(leading_window_days), # Look back X days...
         after = -1, # ...stop at yesterday (-1)

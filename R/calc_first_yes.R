@@ -6,7 +6,7 @@
 #' estimate the onset date of a phenophase such as first leaf, first flower,
 #' or first fruit.
 #'
-#' **Important notes:**
+#' **Notes:**
 #' \itemize{
 #' \item Because the first "Yes" is chosen based on day of year within a calendar
 #' year, it does not account for phenophases that span the turn of the year.
@@ -31,7 +31,11 @@
 #'   }
 #'
 #' @return A tibble with one row per `individual_id`, `phenophase_id`, and
-#'   `year` combination, with a new column `day_of_first_yes`, reporting the day of year of the earliest "yes" observation.
+#'   `year` combination, with a new column
+#'   \describe{
+#'     \item{`day_of_first_yes`}{The day of year of the earliest "Yes" observation for the same
+#'       `individual_id` and `phenophase_id` within the calendar year.}
+#'   }
 #'
 #' @examples
 #' obs <- data.frame(
