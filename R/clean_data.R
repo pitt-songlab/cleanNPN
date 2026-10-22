@@ -109,7 +109,7 @@
 #'   include_conflict = FALSE
 #' )
 #'
-#' #Restrict to a day_of_year window (uses the `day_of_year` column)
+#' # Restrict to a day_of_year window (uses the `day_of_year` column)
 #' clean_data(obs, min_doy = 95, max_doy = 100)
 #'
 #' # Combine several steps
@@ -145,15 +145,19 @@ clean_data <- function(data,
   if (!is.null(leading_window_days) && !is.null(min_leading_no)) {
     message("Cleaning by leading no")
     data_clean <- data_clean |>
-      clean_by_leading_no(leading_window_days = leading_window_days,
-                          include_conflict = include_conflict)
+      clean_by_leading_no(
+        leading_window_days = leading_window_days,
+        include_conflict = include_conflict
+      )
   }
 
   if (!is.null(trailing_window_days) && !is.null(min_trailing_yes)) {
     message("Cleaning by trailing yes")
     data_clean <- data_clean |>
-      clean_by_trailing_yes(trailing_window_days = trailing_window_days,
-                            include_conflict = include_conflict)
+      clean_by_trailing_yes(
+        trailing_window_days = trailing_window_days,
+        include_conflict = include_conflict
+      )
   }
 
   if (!is.null(leading_window_days) && !is.null(min_leading_no)) {

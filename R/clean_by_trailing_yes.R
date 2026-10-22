@@ -21,8 +21,8 @@
 #' [clean_by_leading_no()], which counts "No" records in the window *before*
 #' each observation.
 #'
-#' @param data A data frame of phenology observations. Must contain the
-#'   columns:
+#' @param data A data frame or tibble of phenology observations. Must contain
+#'   the following columns:
 #'   \describe{
 #'     \item{`individual_id`}{Identifier for the individual plant or animal.}
 #'     \item{`phenophase_id`}{Identifier for the phenophase.}
@@ -47,8 +47,10 @@
 #' obs <- data.frame(
 #'   individual_id = 1,
 #'   phenophase_id = 501,
-#'   observation_date = as.Date(c("2023-12-27", "2023-12-29", "2024-01-02",
-#'                                "2024-01-03", "2024-01-03")),
+#'   observation_date = as.Date(c(
+#'     "2023-12-27", "2023-12-29", "2024-01-02",
+#'     "2024-01-03", "2024-01-03"
+#'   )),
 #'   phenophase_status = c(0, 0, 1, 1, 0)
 #' )
 #'

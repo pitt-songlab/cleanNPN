@@ -57,11 +57,11 @@ calc_first_yes <- function(data) {
     dplyr::as_tibble() |>
     dplyr::select(individual_id, phenophase_id, observation_date, day_of_year, phenophase_status) |>
     dplyr::filter(phenophase_status == 1) |>
-    dplyr::mutate(year = lubridate::year(observation_date) ) |>
-    dplyr::group_by(individual_id, phenophase_id, year ) |>
+    dplyr::mutate(year = lubridate::year(observation_date)) |>
+    dplyr::group_by(individual_id, phenophase_id, year) |>
     dplyr::arrange(day_of_year) |>
     dplyr::slice(1) |>
     dplyr::rename(day_of_first_yes = day_of_year) |>
-    dplyr::ungroup () |>
+    dplyr::ungroup() |>
     dplyr::select(phenophase_id, individual_id, year, day_of_first_yes)
 }

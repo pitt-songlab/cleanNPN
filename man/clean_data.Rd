@@ -136,11 +136,16 @@ clean_data(
   include_conflict = FALSE
 )
 
-#Restrict to a day_of_year window (uses the `day_of_year` column)
+# Restrict to a day_of_year window (uses the `day_of_year` column)
 clean_data(obs, min_doy = 95, max_doy = 100)
 
 # Combine several steps
 clean_data(
   obs,
   calculate_observation_option = "all_years",
-  min_leading_no = 1, leading_window_days
+  min_leading_no = 1, leading_window_days = 7,
+  min_trailing_yes = 1, trailing_window_days = 7,
+  min_doy = 60, max_doy = 200
+)
+
+}

@@ -7,8 +7,8 @@
 clean_by_trailing_yes(data, trailing_window_days = 7, include_conflict = TRUE)
 }
 \arguments{
-\item{data}{A data frame of phenology observations. Must contain the
-columns:
+\item{data}{A data frame or tibble of phenology observations. Must contain
+the following columns:
 \describe{
 \item{\code{individual_id}}{Identifier for the individual plant or animal.}
 \item{\code{phenophase_id}}{Identifier for the phenophase.}
@@ -59,8 +59,10 @@ each observation.
 obs <- data.frame(
   individual_id = 1,
   phenophase_id = 501,
-  observation_date = as.Date(c("2023-12-27", "2023-12-29", "2024-01-02",
-                               "2024-01-03", "2024-01-03")),
+  observation_date = as.Date(c(
+    "2023-12-27", "2023-12-29", "2024-01-02",
+    "2024-01-03", "2024-01-03"
+  )),
   phenophase_status = c(0, 0, 1, 1, 0)
 )
 

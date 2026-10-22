@@ -66,7 +66,7 @@
 #'   `calculate_observation_option = "other"`. Required for `"other"`; an
 #'   error is thrown if it is `NULL`. Ignored for the other options.
 #'   Defaults to `NULL`.
-#' 
+#'
 #' @return A tibble containing the filtered observations with all original
 #'   columns and a new column:
 #'   \describe{
@@ -107,7 +107,7 @@
 clean_by_resolving_conflict <- function(data, calculate_observation_option = c("by_year", "all_years", "other"), calculate_observation_by = NULL) {
   calculate_observation_option <- match.arg(calculate_observation_option)
 
-  #validate calculate_observation_by when option is "other"
+  # validate calculate_observation_by when option is "other"
   if (calculate_observation_option == "other" && is.null(calculate_observation_by)) {
     stop(
       "`calculate_observation_by` must be provided when ",
@@ -119,12 +119,12 @@ clean_by_resolving_conflict <- function(data, calculate_observation_option = c("
   if (calculate_observation_option == "by_year") {
     group_vars <- c("observedby_person_id", "year")
     # checks if option is "all_years", if true, only group by observer
-    } else if (calculate_observation_option == "all_years") {
+  } else if (calculate_observation_option == "all_years") {
     group_vars <- c("observedby_person_id")
     # checks if option is "other", combines whatever specified columns into one vector
-    } else if (calculate_observation_option == "other") {
+  } else if (calculate_observation_option == "other") {
     group_vars <- c(calculate_observation_by, "observedby_person_id") |>
-    # remove duplicate entries
+      # remove duplicate entries
       unique() |>
       sort()
   }
