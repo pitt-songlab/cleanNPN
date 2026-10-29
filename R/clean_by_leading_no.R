@@ -54,8 +54,9 @@
 #' obs <- data.frame(
 #'   individual_id = 1,
 #'   phenophase_id = 501,
-#'   observation_date = as.Date(c("2023-12-28", "2023-12-31", "2024-01-02",
-#'                                "2024-01-03", "2024-01-03")),
+#'   observation_date = as.Date(c(
+#'     "2023-12-28", "2023-12-31", "2024-01-02", "2024-01-03", "2024-01-03"
+#'   )),
 #'   phenophase_status = c(0, 0, 0, 1, 0)
 #' )
 #'
