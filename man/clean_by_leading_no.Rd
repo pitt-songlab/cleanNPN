@@ -2,72 +2,82 @@
 % Please edit documentation in R/clean_by_leading_no.R
 \name{clean_by_leading_no}
 \alias{clean_by_leading_no}
-\title{Count "No" observations in a leading window before each observation}
+\title{Count "no" observations in a leading window before each observation}
 \usage{
-clean_by_leading_no(data, leading_window_days = 7, include_conflict = TRUE)
+clean_by_leading_no(data, leading_window_days = 7, prioritize = c("no", "yes"))
 }
 \arguments{
-\item{data}{A data frame or tibble of phenology observations. Must contain
-the following columns:
+\item{data}{A data frame of phenology observations. Must contain the
+columns:
 \describe{
 \item{\code{individual_id}}{Identifier for the individual plant or animal.}
 \item{\code{phenophase_id}}{Identifier for the phenophase.}
 \item{\code{observation_date}}{Date of the observation. Must be of class
 \code{Date} .}
 \item{\code{phenophase_status}}{Integer status of the phenophase: \code{1} = yes, \code{0} = no,
-\code{-1} = uncertain.}
+\code{-1} = unknown.}
 }}
 
-\item{leading_window_days}{A single positive integer giving the length
+\item{leading_window_days}{A single non-negative number giving the length
 of the look back window, in days. The window starts this many days before
 each observation date and ends the day before it. Defaults to \code{7}.}
 
-\item{include_conflict}{Logical, whether to include conflicting "No" records
-when counting leading "No"s. Defaults to \code{TRUE}.}
+\item{prioritize}{Either \code{"no"} (the default) or \code{"yes"}. Determines which
+record is retained when an individual has more than one record for the same
+phenophase on the same date: \code{"no"} keeps a "no" over a "yes", and \code{"yes"}
+keeps a "yes" over a "no".}
 }
 \value{
-A tibble containing all original rows of \code{data} with a new column
+A data frame containing the rows of \code{data} that remain
+after removing unknown-status records and same-day duplicates, with all
+original columns plus:
 \describe{
-\item{\code{leading_no_count}}{The number of "No" records for the same
+\item{\code{leading_no_count}}{The number of "no" records for the same
 \code{individual_id} and \code{phenophase_id} within the leading window before
 each observation date (excluding the date itself).}
 }
+Rows are sorted by \code{individual_id}, \code{phenophase_id}, and then
+\code{observation_date}.
 }
 \description{
-For each observation, counts how many "No"
+For each observation, counts how many "no" (\code{phenophase_status == 0})
 records were made for the same individual and phenophase during a window of
-days leading up to, but not including, that observation's date.
-Conflicting records for the same phenophase on the same date (with both "yes" and "no") are
-either included or excluded, controlled by \code{include_conflict}.
+days leading up to, but not including, that observation's date. Observations
+with unknown status are dropped, and duplicate records on the same day are
+reduced to a single observation determined by \code{prioritize}.
 }
 \details{
 \strong{Sorting and year boundaries.} Observations are ordered by
 \code{observation_date}, \strong{not} by \code{day_of_year}. Because the window is
 defined using calendar dates, the count can cross over January 1st. For
 example, with \code{leading_window_days = 7}, an observation on January 3 will
-count "No" records from the previous December, and so on across any
-year boundary.
+count "no" records from the previous December, and so on across any
+year boundary. Ordering by \code{day_of_year} would incorrectly treat late-year
+observations as occurring after early-year ones, so it is deliberately
+avoided.
 
-\strong{Note:} \code{leading_no_count} counts the number of "No" \emph{records} in the
-window, not the number of consecutive "No" days. Days without any
-observation do not contribute to the count.
+\strong{Note:} \code{leading_no_count} counts the number of "no" \emph{records} in the
+window, not the number of consecutive "no" days. Days without any
+observation do not contribute to the count, so gaps in monitoring lower the
+count rather than interrupting it.
 }
 \examples{
 obs <- data.frame(
   individual_id = 1,
   phenophase_id = 501,
-  observation_date = as.Date(c(
-    "2023-12-28", "2023-12-31", "2024-01-02",
-    "2024-01-03", "2024-01-03"
-  )),
+  observation_date = as.Date(c("2023-12-28", "2023-12-31", "2024-01-02",
+                               "2024-01-03", "2024-01-03")),
   phenophase_status = c(0, 0, 0, 1, 0)
 )
 
-# The Jan 3 duplicate is resolved in favor of "No"; counts for early
-# January include "No" records from December of the prior year.
-clean_by_leading_no(obs, leading_window_days = 7, include_conflict = TRUE)
+# The Jan 3 duplicate is resolved in favor of "no"; counts for early
+# January include "no" records from December of the prior year.
+clean_by_leading_no(obs, leading_window_days = 7, prioritize = "no")
 
-# Exclude conflicting "No" records
-clean_by_leading_no(obs, leading_window_days = 7, include_conflict = FALSE)
+# Prefer "yes" when same-day records conflict
+clean_by_leading_no(obs, leading_window_days = 7, prioritize = "yes")
 
+}
+\seealso{
+\code{\link[slider:summary-index]{slider::slide_index_sum()}}
 }

@@ -3,11 +3,12 @@
 #' For each observation, counts how many "no" (`phenophase_status == 0`)
 #' records were made for the same individual and phenophase during a window of
 #' days leading up to, but not including, that observation's date. Observations
-#' with unknown status are dropped, and duplicate records on the same day are
-#' reduced to a single observation determined by `prioritize`.
+#' with uncertain or missing status are dropped, and duplicate
+#' records on the same day are reduced to a single observation determined by
+#' `prioritize`.
 #'
 #' **Sorting and year boundaries.** Observations are ordered by
-#' `observation_date`, **not** by `day_of_year`. Because the window is
+#' `observation_date`, *not* by `day_of_year`. Because the window is
 #' defined using calendar dates, the count can cross over January 1st. For
 #' example, with `leading_window_days = 7`, an observation on January 3 will
 #' count "no" records from the previous December, and so on across any
@@ -15,10 +16,10 @@
 #' observations as occurring after early-year ones, so it is deliberately
 #' avoided.
 #'
-#' **Note:** `leading_no_count` counts the number of "no" *records* in the
-#' window, not the number of consecutive "no" days. Days without any
-#' observation do not contribute to the count, so gaps in monitoring lower the
-#' count rather than interrupting it.
+#' **Counting records, not days.** `leading_no_count` counts the number of
+#' "no" *records* in the window, not the number of consecutive "no" days. Days
+#' without any observation do not contribute to the count, so gaps in
+#' monitoring lower the count rather than interrupting it.
 #'
 #' @param data A data frame of phenology observations. Must contain the
 #'   columns:
@@ -28,18 +29,18 @@
 #'     \item{`observation_date`}{Date of the observation. Must be of class
 #'       `Date` .}
 #'     \item{`phenophase_status`}{Integer status of the phenophase: `1` = yes, `0` = no,
-#'       `-1` = unknown.}
+#'       `-1` = uncertain.}
 #'   }
 #' @param leading_window_days A single non-negative number giving the length
-#'   of the look back window, in days. The window starts this many days before
+#'   of the leading window, in days. The window starts this many days before
 #'   each observation date and ends the day before it. Defaults to `7`.
 #' @param prioritize Either `"no"` (the default) or `"yes"`. Determines which
 #'   record is retained when an individual has more than one record for the same
 #'   phenophase on the same date: `"no"` keeps a "no" over a "yes", and `"yes"`
 #'   keeps a "yes" over a "no".
 #'
-#' @return A data frame containing the rows of `data` that remain
-#'   after removing unknown-status records and same-day duplicates, with all
+#' @return A tibble containing the rows of `data` that remain after removing
+#'   uncertain- and missing-status records and same-day duplicates, with all
 #'   original columns plus:
 #'   \describe{
 #'     \item{`leading_no_count`}{The number of "no" records for the same

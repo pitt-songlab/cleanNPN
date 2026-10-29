@@ -8,30 +8,35 @@
 #'
 #' **Important notes:**
 #' \itemize{
-#' \item Because the first "yes" is chosen based on day of year within a calendar
-#' year, it does not account for phenophases that span the turn of the year.
-#' \item Only "yes" records of phenophase are considered. Records that are "no" or "uncertain" and records with
-#' missing status are dropped before the first observation is selected. As a
-#' result, individual-phenophase-year combinations without "yes" records do not
-#' appear in the output.
-#' \item The result is unaffected by having multiple "yes" records from different observers
-#' for the same individual on the same day.
+#'   \item Because the first "yes" is chosen based on day of year within a
+#'     calendar year, it does not account for phenophases that span the turn
+#'     of the year.
+#'   \item Only "yes" records are considered. Records that are "no" or
+#'     "uncertain", and records with missing status, are dropped before the
+#'     first observation is selected. As a result, individual-phenophase-year
+#'     combinations without "yes" records do not appear in the output.
+#'   \item Multiple "yes" records from different observers for the same
+#'     individual on the same day do not affect the result.
 #' }
 #'
 #' @param data A data frame or tibble of phenology observations. Must contain
-#'   the following columns:
+#'   the following columns (additional columns are ignored):
 #'   \describe{
-#'     \item{individual_id}{Identifier for the individual plant or animal.}
-#'     \item{phenophase_id}{Identifier for the phenophase.}
-#'     \item{observation_date}{Date of the observation. Must be of class
-#'       `Date` (or otherwise compatible with [lubridate::year()]).}
-#'     \item{day_of_year}{Numeric day of year (1-366) of the observation.}
-#'     \item{phenophase_status}{Integer status of the phenophase: `1` = yes, `0` = no,
-#'       `-1` = unknown.}
+#'     \item{`individual_id`}{Identifier for the individual plant or animal.}
+#'     \item{`phenophase_id`}{Identifier for the phenophase.}
+#'     \item{`observation_date`}{Date of the observation. Must be of class
+#'       `Date`.}
+#'     \item{`day_of_year`}{Numeric day of year (1-366) of the observation.}
+#'     \item{`phenophase_status`}{Integer status of the phenophase: `1` = yes,
+#'       `0` = no, `-1` = uncertain.}
 #'   }
 #'
 #' @return A tibble with one row per `individual_id`, `phenophase_id`, and
-#'   `year` combination, with a new column `day_of_first_yes`, reporting the day of year of the earliest "yes" observation.
+#'   `year` combination, with the new column:
+#'   \describe{
+#'     \item{`day_of_first_yes`}{Day of year of the earliest "yes"
+#'       observation.}
+#'   }
 #'
 #' @examples
 #' obs <- data.frame(
