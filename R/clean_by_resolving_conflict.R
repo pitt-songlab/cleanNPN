@@ -6,6 +6,7 @@
 #' most total observations (a proxy for experience) is retained. Uncertain
 #' and missing status records are removed.
 #'
+#' @details
 #' The function performs the following steps:
 #' \enumerate{
 #'   \item Counts how many observations each observer has made, using the
@@ -44,7 +45,7 @@
 #'     known.
 #' }
 #'
-#' @param data A data frame or tibble of phenology observations. Must contain
+#' @param data A data frame or tibble of phenophase observations. Must contain
 #'   the following columns, plus any columns named in
 #'   `calculate_observation_by`:
 #'   \describe{
