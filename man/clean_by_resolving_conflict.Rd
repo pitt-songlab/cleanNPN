@@ -42,6 +42,8 @@ columns and a new column:
 \item{\code{num_of_observations}}{Number of observations attributed to the
 record's observer within the grouping defined by
 \code{calculate_observation_option}.}
+\item{\code{year}}{Calendar year of \code{observation_date}. Overwrites any
+existing \code{year} column in \code{data}.}
 }
 }
 \description{

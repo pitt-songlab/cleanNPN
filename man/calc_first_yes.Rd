@@ -2,49 +2,56 @@
 % Please edit documentation in R/calc_first_yes.R
 \name{calc_first_yes}
 \alias{calc_first_yes}
-\title{Calculate the day of first "Yes" observation}
+\title{Calculate the day of first "yes" observation}
 \usage{
 calc_first_yes(data)
 }
 \arguments{
-\item{data}{A data frame or tibble of phenology observations. Must contain
+\item{data}{A data frame or tibble of phenophase observations. Must contain
 the following columns:
 \describe{
 \item{individual_id}{Identifier for the individual plant or animal.}
 \item{phenophase_id}{Identifier for the phenophase.}
 \item{observation_date}{Date of the observation. Must be of class
 \code{Date} (or otherwise compatible with \code{\link[lubridate:year]{lubridate::year()}}).}
-\item{day_of_year}{Numeric day of year (1-366) of the observation.}
-\item{phenophase_status}{Integer status of the phenophase: \code{1} = yes, \code{0} = no,
-\code{-1} = uncertain.}
+\item{\code{day_of_year}}{Numeric day of year (1 to 366) of the
+observation.}
+\item{\code{phenophase_status}}{Integer status of the phenophase: \code{1} = yes,
+\code{0} = no, \code{-1} = uncertain.}
 }}
 }
 \value{
-A tibble with one row per \code{individual_id}, \code{phenophase_id}, and
-\code{year} combination, with a new column
+A tibble with one row per combination of \code{individual_id},
+\code{phenophase_id}, and \code{year}, and the following columns:
 \describe{
-\item{\code{day_of_first_yes}}{The day of year of the earliest "Yes" observation for the same
-\code{individual_id} and \code{phenophase_id} within the calendar year.}
+\item{\code{phenophase_id}}{Identifier for the phenophase.}
+\item{\code{individual_id}}{Identifier for the individual plant or animal.}
+\item{\code{year}}{Calendar year of \code{observation_date}.}
+\item{\code{day_of_first_yes}}{The day of year of the earliest "yes"
+observation for the same \code{individual_id} and \code{phenophase_id} within
+the calendar year.}
 }
+All other columns in \code{data} are dropped.
 }
 \description{
-For each combination of individual, phenophase, and calendar
-year, finds the day of year of the earliest observation in which the
-phenophase was recorded as present (a "Yes"). This is commonly used to
-estimate the onset date of a phenophase such as first leaf, first flower,
-or first fruit.
+For each combination of individual, phenophase, and calendar year, finds
+the day of year of the earliest observation in which the phenophase was
+recorded as present (a "yes"). This is commonly used to estimate the onset
+date of a phenophase such as first leaf, first flower, or first fruit.
 }
 \details{
-\strong{Notes:}
+\strong{Important notes:}
 \itemize{
-\item Because the first "Yes" is chosen based on day of year within a calendar
-year, it does not account for phenophases that span the turn of the year.
-\item Only "Yes" records of phenophase are considered. Records that are "No" or "uncertain" and records with
-missing status are dropped before the first observation is selected. As a
-result, individual-phenophase-year combinations without "Yes" records do not
-appear in the output.
-\item The result is unaffected by having multiple "yes" records from different observers
-for the same individual on the same day.
+\item Because the first "yes" is chosen based on day of year within a
+calendar year, it does not account for phenophases that span the turn
+of the year.
+\item Only "yes" records are considered. Records that are "no" or
+"uncertain", and records with a missing status, are dropped before the
+first observation is selected. As a result, combinations of individual,
+phenophase, and year without a "yes" record do not appear in the
+output.
+\item The result is unaffected by having multiple "yes" records from
+different observers for the same individual on the same day.
 }
 }
 \examples{

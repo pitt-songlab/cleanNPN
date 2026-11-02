@@ -7,10 +7,11 @@
 clean_by_window(data, min_doy = NULL, max_doy = NULL)
 }
 \arguments{
-\item{data}{A data frame or tibble of phenophase observations. Must contain the
-column:
+\item{data}{A data frame or tibble of phenophase observations. Must contain
+the following column:
 \describe{
-\item{\code{day_of_year}}{Numeric day of year for the observation.}
+\item{\code{day_of_year}}{Numeric day of year (1 to 366) of the
+observation.}
 }}
 
 \item{min_doy}{A single number giving the earliest day of year (inclusive)
@@ -39,8 +40,8 @@ limit is applied. If both are \code{NULL}, all records with a non-missing
 
 \strong{Important notes:}
 \itemize{
-\item Records with \code{NA} in \code{day_of_year} are always removed.
-This happens even when both bounds are \code{NULL}.
+\item Records with \code{NA} in \code{day_of_year} are always removed. This happens
+even when both bounds are \code{NULL}.
 \item The window is a simple range on a single calendar year's day
 numbering, so it cannot represent a window that wraps around the
 turn of the year (e.g., day 330 to day 30). If \code{min_doy > max_doy},
