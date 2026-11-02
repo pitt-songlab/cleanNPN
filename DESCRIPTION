@@ -1,5 +1,5 @@
 Package: cleanNPN
-Title: cleanNPN
+Title: Reproducible Workflow for Cleaning National Phenology Network Status and Intensity Data
 Version: 0.0.0.9000
 Authors@R: c(
     person("Brianna", "Shepherd", email= "bls227@pitt.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0009-6338-0454", affiliation = "Biological Sciences Department, Univeristy of Pittsburgh, Pittsburgh, PA, USA")),
