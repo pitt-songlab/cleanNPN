@@ -2,12 +2,12 @@
 % Please edit documentation in R/clean_by_leading_no.R
 \name{clean_by_leading_no}
 \alias{clean_by_leading_no}
-\title{Count "No" observations in a leading window before each observation}
+\title{Count "no" observations in a leading window before each observation}
 \usage{
 clean_by_leading_no(data, leading_window_days = 7, include_conflict = TRUE)
 }
 \arguments{
-\item{data}{A data frame or tibble of phenology observations. Must contain
+\item{data}{A data frame or tibble of phenophase observations. Must contain
 the following columns:
 \describe{
 \item{\code{individual_id}}{Identifier for the individual plant or animal.}
@@ -18,39 +18,50 @@ the following columns:
 \code{-1} = uncertain.}
 }}
 
-\item{leading_window_days}{A single positive integer giving the length
-of the look back window, in days. The window starts this many days before
+\item{leading_window_days}{A single positive number giving the length
+of the look-back window, in days. The window starts this many days before
 each observation date and ends the day before it. Defaults to \code{7}.}
 
-\item{include_conflict}{Logical, whether to include conflicting "No" records
-when counting leading "No"s. Defaults to \code{TRUE}.}
+\item{include_conflict}{A single logical value specifying whether to
+include conflicting "no" records when counting leading "no" records.
+Defaults to \code{TRUE}.}
 }
 \value{
-A tibble containing all original rows of \code{data} with a new column
+A tibble containing all rows of \code{data}, sorted by \code{individual_id},
+\code{phenophase_id}, and \code{observation_date}, with all original columns plus
+two new columns:
 \describe{
-\item{\code{leading_no_count}}{The number of "No" records for the same
+\item{\code{leading_no_count}}{The number of "no" records for the same
 \code{individual_id} and \code{phenophase_id} within the leading window before
 each observation date (excluding the date itself).}
+\item{\code{is_conflict}}{Logical. \code{TRUE} if the record's individual,
+phenophase, and date have both a "yes" and a "no" record.}
 }
 }
 \description{
-For each observation, counts how many "No"
-records were made for the same individual and phenophase during a window of
-days leading up to, but not including, that observation's date.
-Conflicting records for the same phenophase on the same date (with both "yes" and "no") are
-either included or excluded, controlled by \code{include_conflict}.
+For each observation, counts how many "no" records were made for the same
+individual and phenophase during a window of days leading up to, but not
+including, that observation's date. Conflicting records (records for the
+same individual and phenophase on the same date that include both a "yes"
+and a "no") are either included or excluded, as controlled by
+\code{include_conflict}.
 }
 \details{
-\strong{Sorting and year boundaries.} Observations are ordered by
+\strong{Important notes:}
+\itemize{
+\item Observations are ordered by
 \code{observation_date}, \strong{not} by \code{day_of_year}. Because the window is
 defined using calendar dates, the count can cross over January 1st. For
 example, with \code{leading_window_days = 7}, an observation on January 3 will
-count "No" records from the previous December, and so on across any
+count "no" records from the previous December, and so on across any
 year boundary.
-
-\strong{Note:} \code{leading_no_count} counts the number of "No" \emph{records} in the
-window, not the number of consecutive "No" days. Days without any
-observation do not contribute to the count.
+\item \code{leading_no_count} counts the number of "no" \strong{records}
+.   in the window, not the number of consecutive "no" days. Days without any
+.   observation do not contribute to the count.
+. \item This function is the backward-looking counterpart to
+\code{\link[=clean_by_trailing_yes]{clean_by_trailing_yes()}}, which counts "yes" records in the window \strong{after}
+each observation.
+}
 }
 \examples{
 obs <- data.frame(
@@ -63,11 +74,11 @@ obs <- data.frame(
   phenophase_status = c(0, 0, 0, 1, 0)
 )
 
-# The Jan 3 duplicate is resolved in favor of "No"; counts for early
-# January include "No" records from December of the prior year.
+# The two records on Jan 3 conflict (one "yes" and one "no"). Counts for
+# early January include "no" records from December of the prior year.
 clean_by_leading_no(obs, leading_window_days = 7, include_conflict = TRUE)
 
-# Exclude conflicting "No" records
+# Exclude conflicting "no" records, which lowers the count for Jan 5
 clean_by_leading_no(obs, leading_window_days = 7, include_conflict = FALSE)
 
 }

@@ -8,20 +8,21 @@
 #' `include_conflict`.
 #'
 #' @details
-#' **Sorting and year boundaries.** Observations are ordered by
-#' `observation_date`, **not** by `day_of_year`. Because the window is
-#' defined using calendar dates, the count can cross over January 1st. For
-#' example, with `trailing_window_days = 7`, an observation on December 29 will
-#' count "yes" records from the following January, and so on across any
-#' year boundary.
-#'
-#' **Important note:** `trailing_yes_count` counts the number of "yes"
-#' *records* in the window, not the number of consecutive "yes" days. Days
-#' without any observation do not contribute to the count.
-#'
-#' This function is the forward-looking counterpart to
-#' [clean_by_leading_no()], which counts "no" records in the window *before*
-#' each observation.
+#' **Important notes:**
+#' \itemize{
+#'   \item Observations are ordered by
+#'     `observation_date`, **not** by `day_of_year`. Because the window is
+#'     defined using calendar dates, the count can cross over January 1st. For
+#'     example, with `trailing_window_days = 7`, an observation on December 29 will
+#'     count "yes" records from the following January, and so on across any
+#'     year boundary.
+#'   \item `trailing_yes_count` counts the number of "yes"
+#'     **records** in the window, not the number of consecutive "yes" days. Days
+#'     without any observation do not contribute to the count.
+#'   \item This function is the forward-looking counterpart to
+#'     [clean_by_leading_no()], which counts "no" records in the window **before**
+#'     each observation.
+#' }
 #'
 #' @param data A data frame or tibble of phenophase observations. Must contain
 #'   the following columns:

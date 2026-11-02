@@ -43,7 +43,6 @@
 #'       observation for the same `individual_id` and `phenophase_id` within
 #'       the calendar year.}
 #'   }
-#'   All other columns in `data` are dropped.
 #'
 #' @examples
 #' obs <- data.frame(
