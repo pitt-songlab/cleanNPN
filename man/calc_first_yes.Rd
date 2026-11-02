@@ -31,7 +31,6 @@ A tibble with one row per combination of \code{individual_id},
 observation for the same \code{individual_id} and \code{phenophase_id} within
 the calendar year.}
 }
-All other columns in \code{data} are dropped.
 }
 \description{
 For each combination of individual, phenophase, and calendar year, finds

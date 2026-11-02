@@ -47,20 +47,21 @@ and a "no") are either included or excluded, as controlled by
 \code{include_conflict}.
 }
 \details{
-\strong{Sorting and year boundaries.} Observations are ordered by
+\strong{Important notes:}
+\itemize{
+\item Observations are ordered by
 \code{observation_date}, \strong{not} by \code{day_of_year}. Because the window is
 defined using calendar dates, the count can cross over January 1st. For
 example, with \code{leading_window_days = 7}, an observation on January 3 will
 count "no" records from the previous December, and so on across any
 year boundary.
-
-\strong{Important note:} \code{leading_no_count} counts the number of "no" \emph{records}
-in the window, not the number of consecutive "no" days. Days without any
-observation do not contribute to the count.
-
-This function is the backward-looking counterpart to
-\code{\link[=clean_by_trailing_yes]{clean_by_trailing_yes()}}, which counts "yes" records in the window \emph{after}
+\item \code{leading_no_count} counts the number of "no" \strong{records}
+.   in the window, not the number of consecutive "no" days. Days without any
+.   observation do not contribute to the count.
+. \item This function is the backward-looking counterpart to
+\code{\link[=clean_by_trailing_yes]{clean_by_trailing_yes()}}, which counts "yes" records in the window \strong{after}
 each observation.
+}
 }
 \examples{
 obs <- data.frame(
