@@ -13,8 +13,174 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(cleanNPN)
+library(dplyr)
+library(ggplot2)
+library(purrr)
+library(patchwork)
 ```
 
+## Overview
+
+This vignette shows how the cleaning functions in `cleanNPN` change estimates
+of flower and leaf onset. We first apply all four cleaning steps together, then
+apply each step on its own to see what it contributes.
+
+The example data frames `df_flower` and `df_leaf` are included with the package.
+
+## Clean data with all four steps
+
+Use `clean_data()` to clean the flower and leaf data frames. We use all four
+data cleaning steps here.
+
+```{r clean-all}
+df_flower_clean <- df_flower |>
+  clean_data(
+    calculate_observation_option = "by_year",
+    min_leading_no = 1,
+    leading_window_days = 14,
+    min_trailing_yes = 1,
+    trailing_window_days = 14,
+    max_doy = 213
+  )
+
+df_leaf_clean <- df_leaf |>
+  clean_data(
+    calculate_observation_option = "by_year",
+    min_leading_no = 1,
+    leading_window_days = 14,
+    min_trailing_yes = 1,
+    trailing_window_days = 14,
+    max_doy = 213
+  )
+```
+
+## Calculate and compare onset day
+
+Use `calc_first_yes()` to calculate the day of first yes for the original and
+cleaned flower data.
+
+```{r flower-onset}
+df_flower_onset <- df_flower |>
+  calc_first_yes()
+
+df_flower_onset_clean <- df_flower_clean |>
+  calc_first_yes()
+```
+
+```{r flower-box, echo = FALSE, fig.width = 5, fig.height = 4, fig.alt = "Boxplots of flower onset day of year for original and cleaned data."}
+plot_onset_box(df_flower_onset, df_flower_onset_clean, "Flower onset")
+```
+
+Do the same for leaf onset.
+
+```{r leaf-onset}
+df_leaf_onset <- df_leaf |>
+  calc_first_yes()
+
+df_leaf_onset_clean <- df_leaf_clean |>
+  calc_first_yes()
+```
+
+```{r leaf-box, echo = FALSE, fig.width = 5, fig.height = 4, fig.alt = "Boxplots of leaf onset day of year for original and cleaned data."}
+plot_onset_box(df_leaf_onset, df_leaf_onset_clean, "Leaf onset")
+```
+
+### Maps of onset before and after cleaning
+
+```{r flower-maps, echo = FALSE, fig.width = 12, fig.height = 4, fig.alt = "Two maps of the contiguous US showing flower onset day of year at each site, before and after cleaning."}
+plot_onset_map(df_flower_onset, "Flower onset (before cleaning)") +
+  plot_onset_map(df_flower_onset_clean, "Flower onset (after cleaning)")
+```
+
+```{r leaf-maps, echo = FALSE, fig.width = 12, fig.height = 4, fig.alt = "Two maps of the contiguous US showing leaf onset day of year at each site, before and after cleaning."}
+plot_onset_map(df_leaf_onset, "Leaf onset (before cleaning)") +
+  plot_onset_map(df_leaf_onset_clean, "Leaf onset (after cleaning)")
+```
+
+## Understand the effects of each cleaning step
+
+Clean the flower and leaf data using each step one at a time.
+
+```{r clean-each}
+# Flower data
+df_flower_observation <- df_flower |>
+  clean_data(calculate_observation_option = "by_year")
+
+df_flower_no <- df_flower |>
+  clean_data(min_leading_no = 1, leading_window_days = 14)
+
+df_flower_yes <- df_flower |>
+  clean_data(min_trailing_yes = 1, trailing_window_days = 14)
+
+df_flower_window <- df_flower |>
+  clean_data(max_doy = 213)
+
+# Leaf data
+df_leaf_observation <- df_leaf |>
+  clean_data(calculate_observation_option = "by_year")
+
+df_leaf_no <- df_leaf |>
+  clean_data(min_leading_no = 1, leading_window_days = 14)
+
+df_leaf_yes <- df_leaf |>
+  clean_data(min_trailing_yes = 1, trailing_window_days = 14)
+
+df_leaf_window <- df_leaf |>
+  clean_data(max_doy = 213)
+```
+
+Calculate onset for each cleaned version by putting the data frames in a named
+list and processing them all at once.
+
+```{r onset-all}
+ls_df_flower <- list(
+  original = df_flower,
+  `all methods` = df_flower_clean,
+  `conflict resolution` = df_flower_observation,
+  `leading no` = df_flower_no,
+  `trailing yes` = df_flower_yes,
+  window = df_flower_window
+)
+
+df_flower_onset_all <- map_dfr(ls_df_flower, calc_first_yes, .id = "group") |>
+  mutate(group = factor(group, group_levels))
+
+ls_df_leaf <- list(
+  original = df_leaf,
+  `all methods` = df_leaf_clean,
+  `conflict resolution` = df_leaf_observation,
+  `leading no` = df_leaf_no,
+  `trailing yes` = df_leaf_yes,
+  window = df_leaf_window
+)
+
+df_leaf_onset_all <- map_dfr(ls_df_leaf, calc_first_yes, .id = "group") |>
+  mutate(group = factor(group, group_levels))
+```
+
+Compare the distribution of onset dates across cleaning methods.
+
+```{r violin-all, echo = FALSE, fig.width = 8, fig.height = 6, fig.alt = "Violin plots of flower onset (top) and leaf onset (bottom) day of year for the original data, each cleaning step alone, and all methods combined."}
+flower_master_onset <- plot_onset_violin(df_flower_onset_all, "Flower onset")
+leaf_master_onset <- plot_onset_violin(df_leaf_onset_all, "Leaf onset")
+
+flower_master_onset / leaf_master_onset +
+  plot_layout(axes = "collect")
+```
 ```{r setup}
 library(cleanNPN)
 ```
+
+## Overview
+
+We coded four functions to clean NPN status intensity data.
+
+- **`clean_by_resolving_conflict()`**: keeps only one observation for a phenophase of an individual on the same date, resolving conflicts in observations between users. The observation kept is made by the most engaged user, measured by the total observations by an observer in that year, in all years, or with a user-defined grouping.
+
+- **`clean_by_leading_no()`**: reviews observations for an individual and phenophase, removes uncertain status records (-1), deduplicates multiple daily observations by prioritizing "no" (0) over "yes" (1), and calculates the total count of "no" observations recorded in the preceding user-defined window (looking backward from yesterday).
+
+- **`clean_by_trailing_yes()`**: reviews observations for an individual and phenophase, removes uncertain status records (-1), deduplicates multiple daily observations by prioritizing "yes" (1) over "no" (0), and calculates the total count of "yes" observations recorded in the subsequent user-defined window (looking forward from tomorrow).
+
+- **`clean_by_window()`**: removes any observations outside a window defined by minimum and maximum day of year.
+
+We also coded a wrapper function, `clean_data()`, that executes data cleaning with any of the four steps.
