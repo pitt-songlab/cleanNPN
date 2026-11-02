@@ -18,3 +18,7 @@ Imports:
     rnpn,
     slider,
     rlang
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

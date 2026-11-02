@@ -58,3 +58,4 @@ po/*~
 rsconnect/
 .positai
 .Rproj.user
+inst/doc
