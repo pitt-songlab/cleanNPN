@@ -1,6 +1,6 @@
-#' Count "Yes" observations in a trailing window after each observation
+#' Count "yes" observations in a trailing window after each observation
 #'
-#' For each observation, counts how many "Yes"
+#' For each observation, counts how many "yes"
 #' records were made for the same individual and phenophase during a window of
 #' days following, but not including, that observation's date.
 #' Conflicting records for the same phenophase on the same date (with both "yes" and "no") are
@@ -10,11 +10,11 @@
 #' `observation_date`, **not** by `day_of_year`. Because the window is
 #' defined using calendar dates, the count can cross over January 1st. For
 #' example, with `trailing_window_days = 7`, an observation on December 29 will
-#' count "Yes" records from the following January, and so on across any
+#' count "yes" records from the following January, and so on across any
 #' year boundary.
 #'
-#' **Note:** `trailing_yes_count` counts the number of "Yes" *records* in the
-#' window, not the number of consecutive "Yes" days. Days without any
+#' **Note:** `trailing_yes_count` counts the number of "yes" *records* in the
+#' window, not the number of consecutive "yes" days. Days without any
 #' observation do not contribute to the count.
 #'
 #' This function is the forward-looking counterpart to
@@ -33,12 +33,12 @@
 #' @param trailing_window_days A single non-negative number giving the length
 #'   of the forward-looking window, in days. The window starts the day after
 #'   each observation date and ends this many days after it. Defaults to `7`.
-#' @param include_conflict Logical, whether to include conflicting "Yes" records
-#'   when counting trailing "Yes"s. Defaults to `TRUE`.
+#' @param include_conflict Logical, whether to include conflicting "yes" records
+#'   when counting trailing "yes"s. Defaults to `TRUE`.
 #'
 #' @return A tibble containing all original rows of `data` with a new column
 #'   \describe{
-#'     \item{`trailing_yes_count`}{The number of "Yes" records for the same
+#'     \item{`trailing_yes_count`}{The number of "yes" records for the same
 #'       `individual_id` and `phenophase_id` within the trailing window after
 #'       each observation date (excluding the date itself).}
 #'   }
@@ -54,11 +54,11 @@
 #'   phenophase_status = c(0, 0, 1, 1, 0)
 #' )
 #'
-#' # The Jan 3 duplicate is resolved in favor of "Yes"; counts for late
-#' # December include "Yes" records from January of the following year.
+#' # The Jan 3 duplicate is resolved in favor of "yes"; counts for late
+#' # December include "yes" records from January of the following year.
 #' clean_by_trailing_yes(obs, trailing_window_days = 7, include_conflict = TRUE)
 #'
-#' # Exclude conflicting "Yes" records
+#' # Exclude conflicting "yes" records
 #' clean_by_trailing_yes(obs, trailing_window_days = 7, include_conflict = FALSE)
 #'
 #' @export
@@ -73,7 +73,7 @@ clean_by_trailing_yes <- function(data, trailing_window_days = 7, include_confli
     # Look forward from tomorrow (.i = obsdate + 1) up to the window limit
     dplyr::mutate(
       trailing_yes_count = slider::slide_index_sum(
-        x = (phenophase_status == 1 & (!is_conflict | include_conflict)), # Count "Yes" records, optionally including conflicts
+        x = (phenophase_status == 1 & (!is_conflict | include_conflict)), # Count "yes" records, optionally including conflicts
         i = observation_date,
         before = -1, # Start counting from tomorrow...
         after = lubridate::days(trailing_window_days), # ...up until X days from now
