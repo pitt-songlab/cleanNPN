@@ -73,6 +73,8 @@
 #'     \item{`num_of_observations`}{Number of observations attributed to the
 #'       record's observer within the grouping defined by
 #'       `calculate_observation_option`.}
+#'     \item{`year`}{Calendar year of `observation_date`. Overwrites any
+#'       existing `year` column in `data`.}
 #'   }
 #'
 #' @examples

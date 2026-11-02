@@ -14,8 +14,8 @@
 #'
 #' **Important notes:**
 #' \itemize{
-#'   \item Records with `NA` in `day_of_year` are always removed.
-#'     This happens even when both bounds are `NULL`.
+#'   \item Records with `NA` in `day_of_year` are always removed. This happens
+#'     even when both bounds are `NULL`.
 #'   \item The window is a simple range on a single calendar year's day
 #'     numbering, so it cannot represent a window that wraps around the
 #'     turn of the year (e.g., day 330 to day 30). If `min_doy > max_doy`,
@@ -26,10 +26,11 @@
 #'     one day between years.
 #' }
 #'
-#' @param data A data frame or tibble of phenophase observations. Must contain the
-#'   column:
+#' @param data A data frame or tibble of phenophase observations. Must contain
+#'   the following column:
 #'   \describe{
-#'     \item{`day_of_year`}{Numeric day of year for the observation.}
+#'     \item{`day_of_year`}{Numeric day of year (1 to 366) of the
+#'       observation.}
 #'   }
 #' @param min_doy A single number giving the earliest day of year (inclusive)
 #'   to keep. If `NULL` (the default), there is no lower limit.
