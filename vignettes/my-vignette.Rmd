@@ -109,6 +109,12 @@ library(cleanNPN)
 data("df_flower")
 data("df_leaf")
 
+data_path <- system.file("extdata", "df_flower.csv", package = "cleanNPN")
+df_flower <- read.csv(data_path)
+
+data_path <- system.file("extdata", "df_leaf.csv", package = "cleanNPN")
+df_leaf <- read.csv(data_path)
+
 head(df_flower)
 ```
 
