@@ -112,8 +112,14 @@ data("df_leaf")
 data_path <- system.file("extdata", "df_flower.csv", package = "cleanNPN")
 df_flower <- read.csv(data_path)
 
+#Set observation_date to Date class
+df_flower$observation_date <- as.Date(df_flower$observation_date)
+
 data_path <- system.file("extdata", "df_leaf.csv", package = "cleanNPN")
 df_leaf <- read.csv(data_path)
+
+#Set observation_date to Date class
+df_leaf$observation_date <- as.Date(df_leaf$observation_date)
 
 head(df_flower)
 ```
