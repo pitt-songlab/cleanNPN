@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with CleanNPN"
+title: "Getting Started with cleanNPN"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting Started with CleanNPN}
@@ -19,18 +19,106 @@ library(purrr)
 library(patchwork)
 ```
 
-## Overview
+## Purpose
 
-This vignette shows how the cleaning functions in `cleanNPN` change estimates
-of flower and leaf onset. We first apply all four cleaning steps together, then
-apply each step on its own to see what it contributes.
+The USA National Phenology Network (USA-NPN) coordinates *Nature's Notebook*, a community science program in which volunteers and professional scientists record the seasonal activity of plants and animals across the United States. On each visit, observers report **status data** for standardized phenophases such as "breaking leaf buds" or "open flowers" (`1` = yes, `0` = no, `-1` = uncertain). Together, these repeated observations of the same individuals form a detailed record used to study responses to climate.
+
+Community science data also come with challenges. Observers vary in training, visit frequency, and when they begin monitoring, and some records conflict or contain errors. A phenophase may already be underway when monitoring starts, or a single "yes" may be a misidentification. This package provides modular functions for identifying and removing potential outliers from large amounts of raw status data. Most `clean_by_*` functions **annotate, then filter**: they add columns describing how well supported each record is, and you choose the thresholds. A helper function, `calc_first_yes()`, calculates onset dates from the cleaned data.
+
+## Required input
+
+| Column              | Description                                    |
+|---------------------|------------------------------------------------|
+| `individual_id`     | Identifier for the individual plant or animal  |
+| `phenophase_id`     | Identifier for the phenophase                  |
+| `observation_date`  | Date of the observation (must be class `Date`) |
+| `phenophase_status` | `1` = yes, `0` = no, `-1` = uncertain          |
+
+## Cleaning functions
+
+| Function | Problem it addresses | Adds columns |
+|------------------------|------------------------|------------------------|
+| `clean_by_resolving_conflict()` | Contradictory records for the same individual and phenophase | *(to confirm)* |
+| `clean_by_leading_no()` | Phenophase may have begun before monitoring started | `leading_no_count`, `is_conflict` |
+| `clean_by_trailing_yes()` | Isolated "yes" records not supported by later observations | *(to confirm)* |
+| `clean_by_window()` | Dates outside a plausible day-of-year range | *(to confirm)* |
+
+### `clean_by_leading_no()`
+
+```{r leading-no-usage}
+clean_by_leading_no(data, leading_window_days = 7, include_conflict = TRUE)
+```
+
+For each observation, counts the "no" records for the same individual and phenophase in the `leading_window_days` before that observation's date (the date itself is excluded). A "yes" with a count of zero has no recent "no" behind it, so the phenophase may have begun before monitoring started.
+
+**Arguments**
+
+- `leading_window_days`: length of the look-back window in days (default 7).
+- `include_conflict`: whether conflicting records are counted as "no" records (default `TRUE`).
+
+**Returns** a tibble with all original rows, sorted by `individual_id`, `phenophase_id`, and `observation_date`, plus `leading_no_count` and `is_conflict`.
+
+**Things to know**
+
+- The window uses calendar dates, so it crosses year boundaries.
+- The count is the number of "no" *records*, not consecutive "no" days.
+
+## Optional: calculating onset dates
+
+```{r calc-first-yes-usage}
+calc_first_yes(data)
+```
+
+For each combination of individual, phenophase, and calendar year, this finds the day of year of the earliest observation recorded as present ("yes"). It does no cleaning itself, so the result is only as reliable as the filtering you applied beforehand.
+
+## Example workflow
+
+```{r workflow}
+annotated <- data |>
+  clean_by_leading_no(leading_window_days = 7) |>
+  clean_by_trailing_yes(trailing_window_days = 7)
+
+# Keep "yes" records with a recent "no" and a later "yes"
+cleaned <- annotated |>
+  filter(phenophase_status != 1 |
+           (leading_no_count >= 1 & trailing_yes_count >= 1))
+
+onset <- calc_first_yes(cleaned)
+```
+
+## Choosing your options
+
+- Larger windows retain more data but allow more uncertainty.
+- Use `is_conflict` to inspect or exclude same-day "yes"/"no" records.
+- Base day-of-year bounds on knowledge of your species and region.
+- Record your thresholds so your analysis is reproducible.
+
+This vignette shows how the cleaning functions in `cleanNPN` change estimates of flower and leaf onset. We first apply all four cleaning steps together, then apply each step on its own to see what it contributes.
 
 The example data frames `df_flower` and `df_leaf` are included with the package.
 
+## Example data
+
+The package includes two example datasets of USA-NPN status data for red maple
+(*Acer rubrum*): `df_flower` (flower phenophases) and `df_leaf` (leaf
+phenophases). Both contain all 2025 observations submitted across the United
+States.
+
+```{r load-data}
+library(cleanNPN)
+data("df_flower")
+data("df_leaf")
+
+head(df_flower)
+```
+
+Each row is one observation of one phenophase on one individual. The columns
+used by the cleaning functions are `individual_id`, `phenophase_id`,
+`observation_date`, and `phenophase_status`.
+
 ## Clean data with all four steps
 
-Use `clean_data()` to clean the flower and leaf data frames. We use all four
-data cleaning steps here.
+Use `clean_data()` to clean the flower and leaf data frames. We use all four data cleaning steps here. 
 
 ```{r clean-all}
 df_flower_clean <- df_flower |>
@@ -56,8 +144,7 @@ df_leaf_clean <- df_leaf |>
 
 ## Calculate and compare onset day
 
-Use `calc_first_yes()` to calculate the day of first yes for the original and
-cleaned flower data.
+Use `calc_first_yes()` to calculate the day of first "yes" for the original and cleaned flower data.
 
 ```{r flower-onset}
 df_flower_onset <- df_flower |>
@@ -71,7 +158,7 @@ df_flower_onset_clean <- df_flower_clean |>
 plot_onset_box(df_flower_onset, df_flower_onset_clean, "Flower onset")
 ```
 
-Do the same for leaf onset.
+Now repeat to calculate the day of first "yes" for the original and cleaned leaves data.
 
 ```{r leaf-onset}
 df_leaf_onset <- df_leaf |>
@@ -99,7 +186,7 @@ plot_onset_map(df_leaf_onset, "Leaf onset (before cleaning)") +
 
 ## Understand the effects of each cleaning step
 
-Clean the flower and leaf data using each step one at a time.
+To better understand the role of each function, clean the flower and leaf data using each step one at a time.
 
 ```{r clean-each}
 # Flower data
@@ -129,8 +216,7 @@ df_leaf_window <- df_leaf |>
   clean_data(max_doy = 213)
 ```
 
-Calculate onset for each cleaned version by putting the data frames in a named
-list and processing them all at once.
+Calculate onset for each cleaned version by putting the data frames in a named list and processing them all at once.
 
 ```{r onset-all}
 ls_df_flower <- list(
@@ -167,20 +253,3 @@ leaf_master_onset <- plot_onset_violin(df_leaf_onset_all, "Leaf onset")
 flower_master_onset / leaf_master_onset +
   plot_layout(axes = "collect")
 ```
-```{r setup}
-library(cleanNPN)
-```
-
-## Overview
-
-We coded four functions to clean NPN status intensity data.
-
-- **`clean_by_resolving_conflict()`**: keeps only one observation for a phenophase of an individual on the same date, resolving conflicts in observations between users. The observation kept is made by the most engaged user, measured by the total observations by an observer in that year, in all years, or with a user-defined grouping.
-
-- **`clean_by_leading_no()`**: reviews observations for an individual and phenophase, removes uncertain status records (-1), deduplicates multiple daily observations by prioritizing "no" (0) over "yes" (1), and calculates the total count of "no" observations recorded in the preceding user-defined window (looking backward from yesterday).
-
-- **`clean_by_trailing_yes()`**: reviews observations for an individual and phenophase, removes uncertain status records (-1), deduplicates multiple daily observations by prioritizing "yes" (1) over "no" (0), and calculates the total count of "yes" observations recorded in the subsequent user-defined window (looking forward from tomorrow).
-
-- **`clean_by_window()`**: removes any observations outside a window defined by minimum and maximum day of year.
-
-We also coded a wrapper function, `clean_data()`, that executes data cleaning with any of the four steps.
