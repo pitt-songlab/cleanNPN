@@ -23,7 +23,7 @@ library(patchwork)
 
 The USA National Phenology Network (USA-NPN) coordinates *Nature's Notebook*, a community science program in which volunteers and professional scientists record the seasonal activity of plants and animals across the United States. On each visit, observers report **status data** for standardized phenophases such as "breaking leaf buds" or "open flowers" (`1` = yes, `0` = no, `-1` = uncertain). Together, these repeated observations of the same individuals form a detailed record used to study responses to climate.
 
-Community science data also come with challenges. Observers vary in training, visit frequency, and when they begin monitoring, and some records conflict or contain errors. A phenophase may already be underway when monitoring starts, or a single "yes" may be a misidentification. This package provides modular functions for identifying and removing potential outliers from large amounts of raw status data. Most `clean_by_*` functions **annotate, then filter**: they add columns describing how well supported each record is, and you choose the thresholds. A helper function, `calc_first_yes()`, calculates onset dates from the cleaned data.
+Community science data also come with challenges. Observers vary in training, visit frequency, and when they begin monitoring, and some records conflict or contain errors. Multiple observers may report different statuses for the same plant on the same day, a phenophase may already be underway when monitoring starts, a single "yes" may be a misidentification, and some dates fall outside the biologically plausible season. This package provides modular functions for identifying and removing potential outliers from large amounts of raw status data. Some `clean_by_*` functions remove records directly, while others add columns describing how well supported each record is, so you can choose your own thresholds before filtering. A helper function, `calc_first_yes()`, calculates onset dates from the cleaned data.
 
 ## Required input
 
@@ -38,7 +38,7 @@ Community science data also come with challenges. Observers vary in training, vi
 
 | Function | Problem it addresses | Adds columns |
 |------------------------|------------------------|------------------------|
-| `clean_by_resolving_conflict()` | Contradictory records for the same individual and phenophase | *(to confirm)* |
+| `clean_by_resolving_conflict()` | Contradictory records for the same individual and phenophase on the same date | *(to confirm)* |
 | `clean_by_leading_no()` | Phenophase may have begun before monitoring started | `leading_no_count`, `is_conflict` |
 | `clean_by_trailing_yes()` | Isolated "yes" records not supported by later observations | *(to confirm)* |
 | `clean_by_window()` | Dates outside a plausible day-of-year range | *(to confirm)* |
@@ -62,6 +62,131 @@ For each observation, counts the "no" records for the same individual and phenop
 
 - The window uses calendar dates, so it crosses year boundaries.
 - The count is the number of "no" *records*, not consecutive "no" days.
+
+### `clean_by_trailing_yes()`
+
+```{r trailing-yes-usage}
+clean_by_trailing_yes(data, trailing_window_days = 7, include_conflict = TRUE)
+```
+
+For each observation, counts the "yes" records for the same individual and
+phenophase in the `trailing_window_days` after that observation's date (the
+date itself is excluded). A "yes" with a count of zero has no later "yes" to
+support it, so it may be a one-off false positive such as a misidentification
+or data-entry error.
+
+**Arguments**
+
+- `trailing_window_days`: length of the look-forward window in days
+  (default 7). The window starts the day after each observation date.
+- `include_conflict`: whether conflicting records are counted as "yes"
+  records (default `TRUE`).
+
+**Returns** a tibble with all original rows, sorted by `individual_id`,
+`phenophase_id`, and `observation_date`, plus:
+
+- `trailing_yes_count`: the number of "yes" records for the same individual
+  and phenophase within the trailing window after each observation date.
+- `is_conflict`: `TRUE` if that record's individual, phenophase, and date
+  have both a "yes" and a "no" record.
+
+**Things to know**
+
+- The window uses calendar dates, so it crosses year boundaries. With
+  `trailing_window_days = 7`, a December 29 observation counts "yes" records
+  from the following January.
+- The count is the number of "yes" *records*, not consecutive "yes" days. Days
+  without any observation do not contribute.
+- This function does not remove any rows. Filter on `trailing_yes_count` to
+  apply your own threshold.
+- It is the forward-looking counterpart to `clean_by_leading_no()`, which
+  counts "no" records in the window before each observation.
+
+### `clean_by_resolving_conflict()`
+
+```{r resolving-conflict-usage}
+clean_by_resolving_conflict(
+  data,
+  calculate_observation_option = c("by_year", "all_years", "other"),
+  calculate_observation_by = NULL
+)
+```
+
+Cleans records in which multiple observers reported on the same individual,
+phenophase, and date. When observers disagree or duplicate each other, the
+record from the observer with the most total observations (a proxy for
+experience) is retained. Uncertain and missing status records are removed.
+
+**Arguments**
+
+- `calculate_observation_option`: how each observer's number of observations
+  is counted (default `"by_year"`):
+    - `"by_year"`: per observer per year.
+    - `"all_years"`: per observer across the entire dataset.
+    - `"other"`: per observer within the grouping column(s) given in
+      `calculate_observation_by`, such as a site column.
+- `calculate_observation_by`: a character vector of column name(s) used for
+  grouping when `calculate_observation_option = "other"` (default `NULL`).
+  It is required for `"other"`, and an error is thrown if it is `NULL`. It is
+  ignored for the other options.
+
+**Returns** a tibble containing the filtered observations with all original
+columns plus:
+
+- `num_of_observations`: the number of observations attributed to the
+  record's observer within the chosen grouping.
+- `year`: the calendar year of `observation_date`. This overwrites any
+  existing `year` column in `data`.
+
+**Things to know**
+
+- The data must also contain an `observedby_person_id` column identifying
+  the observer, in addition to the standard required columns.
+- Observations are counted *before* uncertain (`-1`) and `NA` records are
+  removed, so those records still contribute to an observer's total.
+- Ties are preserved. If two observers have the same number of observations
+  for an individual, phenophase, and date, both records are kept, so the
+  output may still contain more than one record per date.
+- Records with no conflict (only one observer for that individual,
+  phenophase, and date) are always retained, provided their status is known.
+- With a single year of data, such as the 2025 example data, `"by_year"` and
+  `"all_years"` give the same result.
+  
+### `clean_by_window()`
+
+```{r window-usage}
+clean_by_window(data, min_doy = NULL, max_doy = NULL)
+```
+
+Keeps only the observations whose `day_of_year` falls within a range you set.
+This is useful for excluding records outside the part of the year in which a
+phenophase is biologically plausible, for example removing leaf-out records
+from late autumn. Either bound may be left open.
+
+**Arguments**
+
+- `min_doy`: the earliest day of year (inclusive) to keep. If `NULL` (the
+  default), there is no lower limit.
+- `max_doy`: the latest day of year (inclusive) to keep. If `NULL` (the
+  default), there is no upper limit.
+
+**Returns** a tibble containing the filtered observations with all original
+columns. Only rows with `day_of_year` between `min_doy` and `max_doy` are
+kept.
+
+**Things to know**
+
+- The data must contain a numeric `day_of_year` column (1 to 366).
+- Both bounds are inclusive.
+- Records with `NA` in `day_of_year` are always removed, even when both
+  bounds are `NULL`.
+- The window is a simple range within a single calendar year, so it cannot
+  represent a window that wraps around the new year (for example, day 330 to
+  day 30). If `min_doy > max_doy`, no rows are returned.
+- Day 366 occurs only in leap years, and dates after February differ by one
+  day of year between leap and non-leap years.
+- Base the bounds on knowledge of your species and region, not on the data
+  itself.  
 
 ## Optional: calculating onset dates
 
@@ -99,10 +224,7 @@ The example data frames `df_flower` and `df_leaf` are included with the package.
 
 ## Example data
 
-The package includes two example datasets of USA-NPN status data for red maple
-(*Acer rubrum*): `df_flower` (flower phenophases) and `df_leaf` (leaf
-phenophases). Both contain all 2025 observations submitted across the United
-States.
+The package includes two example datasets of USA-NPN status data for red maple (*Acer rubrum*): `df_flower` (flower phenophases) and `df_leaf` (leaf phenophases). Both contain all 2025 observations submitted across the United States.
 
 ```{r load-data}
 library(cleanNPN)
@@ -124,13 +246,11 @@ df_leaf$observation_date <- as.Date(df_leaf$observation_date)
 head(df_flower)
 ```
 
-Each row is one observation of one phenophase on one individual. The columns
-used by the cleaning functions are `individual_id`, `phenophase_id`,
-`observation_date`, and `phenophase_status`.
+Each row is one observation of one phenophase on one individual. The columns used by the cleaning functions are `individual_id`, `phenophase_id`, `observation_date`, and `phenophase_status`.
 
 ## Clean data with all four steps
 
-Use `clean_data()` to clean the flower and leaf data frames. We use all four data cleaning steps here. 
+Use `clean_data()` to clean the flower and leaf data frames. We use all four data cleaning steps here.
 
 ```{r clean-all}
 df_flower_clean <- df_flower |>
