@@ -20,6 +20,7 @@ Imports:
     rlang
 Suggests: 
     knitr,
+    ggplot2,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
