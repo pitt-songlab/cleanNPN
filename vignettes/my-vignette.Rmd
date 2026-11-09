@@ -116,7 +116,18 @@ df_flower_onset_clean <- df_flower_clean |>
 ```
 
 ```{r flower-box, echo = FALSE, fig.width = 5, fig.height = 4, fig.alt = "Boxplots of flower onset day of year for original and cleaned data."}
-plot_onset_box(df_flower_onset, df_flower_onset_clean, "Flower onset")
+#| echo: false
+bind_rows(
+  df_flower_onset |> mutate(group = "original"),
+  df_flower_onset_clean |> mutate(group = "clean")
+) |>
+  mutate(group = factor(group, c("original", "clean"))) |>
+  ggplot(aes(x = group, y = day_of_first_yes)) +
+  geom_boxplot(outlier.alpha = 0) +
+  geom_jitter(alpha = 0.1) +
+  labs(x = "Data cleaning method", y = "Day of year", title = "Flower onset") +
+  theme(axis.title.y = element_text(margin = margin(r = 10)))
+```
 ```
 
 [Add 2-3 sentences interpreting the plot, such as how the median shifts after cleaning and whether early outliers were removed.]
@@ -160,7 +171,22 @@ df_flower_onset_all <- ls_df_flower |>
 Compare the distribution of onset dates across cleaning methods.
 
 ```{r violin-all, echo = FALSE, fig.width = 8, fig.height = 4, fig.alt = "Violin plots of flower onset day of year for the original data, each cleaning step alone, and all methods combined."}
-plot_onset_violin(df_flower_onset_all, "Flower onset")
+#| echo: false
+
+# Visualize distribution of onset date
+okabe_ito <- c(
+  "#E69F00", "#F0E442", "#D55E00",
+  "#56B4E9", "#009E73", "#0072B2"
+)
+
+flower_master_onset <- df_flower_onset_all |>
+  ggplot(aes(x = group, y = day_of_first_yes, fill = group)) +
+  geom_violin() +
+  scale_fill_manual(values = okabe_ito) +
+  geom_jitter(alpha = .1) +
+  scale_x_discrete(limits = c("original", "leading no", "trailing yes", "conflict resolution", "window", "all methods")) +
+  labs(x = "Data cleaning method", y = "Day of year", title = "Flower onset") +
+  theme(legend.position = "none", axis.title.x = element_text(margin = margin(t = 10)), axis.title.y = element_text(margin = margin(r = 10)))
 ```
 
 [Add 2-3 sentences on which step changes the distribution most.]
