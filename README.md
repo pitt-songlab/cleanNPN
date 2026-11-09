@@ -8,8 +8,6 @@
 
 <!-- One or two sentences: what does the package do, and who is it for? -->
 
-## Overview
-
 ```{=html}
 <!-- Expand on the purpose of the package.
      - What problem does it solve?
@@ -33,11 +31,11 @@ install.packages("cleanNPN")
 
 ``` r
 # install.packages("pak")
-pak::pak("username/packagename")
+pak::pak("pitt-songlab/cleanNPN")
 
 # or with remotes
 # install.packages("remotes")
-remotes::install_github("username/packagename")
+remotes::install_github("pitt-songlab/cleanNPN")
 ```
 
 ### System requirements
@@ -94,7 +92,33 @@ result
 
 <!-- Describe any datasets included with the package. -->
 
-## Contributing
+##Testing
+
+We have developed testthat unit tests covering all core functions. 
+
+```r
+# from within R or RStudio, with your working directory set to the package root
+devtools::test()
+```
+
+## Citation
+
+<!-- Tell people how to cite your package. Run citation("packagename") in R. -->
+
+To cite this package in publication use:
+
+Shepherd, B. L., Song, Y (2026). cleanNPN. R package version 0.1.0, https://github.com/pitt-songlab/cleanNPN
+
+``` r
+@Manual{, 
+  title = {CleanNPN}, 
+  author = {Brianna Shepherd and Yiluan Song}, 
+  year = {2026}, 
+  note = {R package version 0.1.0}, 
+  url = {<https://github.com/pitt-songlab/cleanNPN>}, }
+```
+
+## Community Guidelines
 
 <!-- How can others help? Link to CONTRIBUTING.md and your code of conduct. -->
 
@@ -103,13 +127,9 @@ Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTIN
 - Report bugs or request features via [GitHub Issues](https://github.com/username/packagename/issues)
 - Submit pull requests against the `main` branch
 
-## Citation
+If you encounter a bug or have a suggestion for improvement, please open an issue in the GitHub Issue Tracker. Please provide a minimal reproducible example (reprex) if reporting a bug.
 
-<!-- Tell people how to cite your package. Run citation("packagename") in R. -->
-
-``` r
-citation("packagename")
-```
+If you have questions regarding the usage of the package or need help with a specific workflow, please contact the maintainer, NAME HERE.
 
 ## License
 
